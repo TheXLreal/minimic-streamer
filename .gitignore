@@ -1,0 +1,5 @@
+# build output (build_all.sh and manual CMake builds)
+dist/
+firmware/build*/
+# PC encoder tool (codec/README.md)
+codec/pc_encode

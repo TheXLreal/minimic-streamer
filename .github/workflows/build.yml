@@ -1,0 +1,97 @@
+# Builds the firmware for all four boards from source on GitHub's runners.
+# - every push / pull request: build and keep the .uf2 files as a workflow artifact
+# - a pushed tag "v*" (e.g. v0.1beta): also publish the four .uf2 files on a GitHub Release
+#   (tags containing alpha/beta/rc become a pre-release), with a signed build-provenance
+#   attestation that ties each file to this source and this run.
+#   Check a download with:  gh attestation verify minimic_streamer_v0.1beta_pico2_w.uf2 --repo peter6005/minimic-streamer
+name: Build firmware
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PICO_SDK_VERSION: 2.3.1
+  TINYUSB_VERSION: 0.20.0   # UAC1 audio needs >= 0.20.0; the SDK ships 0.18.0
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi \
+            libstdc++-arm-none-eabi-newlib build-essential python3 git pkg-config libusb-1.0-0-dev
+          arm-none-eabi-gcc --version | head -n1
+          cmake --version | head -n1
+
+      - name: Fetch Pico SDK ${{ env.PICO_SDK_VERSION }}
+        run: |
+          git clone --depth 1 --branch "$PICO_SDK_VERSION" https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+          git -C "$RUNNER_TEMP/pico-sdk" submodule update --init --depth 1
+          # replace the SDK's TinyUSB (0.18.0) with the version the UAC1 audio needs
+          git -C "$RUNNER_TEMP/pico-sdk/lib/tinyusb" fetch --depth 1 origin "refs/tags/$TINYUSB_VERSION:refs/tags/$TINYUSB_VERSION"
+          git -C "$RUNNER_TEMP/pico-sdk/lib/tinyusb" checkout --quiet "$TINYUSB_VERSION"
+          echo "PICO_SDK_PATH=$RUNNER_TEMP/pico-sdk" >> "$GITHUB_ENV"
+          # build picotool (needed to make .uf2 files) once, shared by all four boards
+          echo "PICOTOOL_FETCH_FROM_GIT_PATH=$RUNNER_TEMP/picotool" >> "$GITHUB_ENV"
+
+      - name: Build all boards
+        run: |
+          # file names carry the version: the tag for releases, dev-<commit> otherwise
+          if [ "$GITHUB_REF_TYPE" = tag ]; then VERSION="$GITHUB_REF_NAME"; else VERSION="dev-${GITHUB_SHA::7}"; fi
+          VERSION="$VERSION" OUT=dist ./build_all.sh
+
+      - name: Checksums
+        run: sha256sum dist/*.uf2
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write       # create the release
+      id-token: write       # sign the attestation
+      attestations: write   # store the attestation
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: dist
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/*.uf2
+
+      # the release text is written by hand afterwards on the GitHub release page (Edit release)
+      - name: Publish GitHub Release (the four .uf2 files only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          PRERELEASE=""
+          case "$TAG" in *alpha*|*beta*|*rc*) PRERELEASE="--prerelease" ;; esac
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes "" $PRERELEASE
+          fi
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber dist/*.uf2
