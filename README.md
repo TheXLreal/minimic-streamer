@@ -1,5 +1,19 @@
 # MiniMic Streamer
 
+**nRF5340 DK port (built-in radio):** see [the Russian setup and controls guide](NRF5340DK_RU.md).
+Build with `tools/build-nrf5340.ps1`; the two-core firmware is in `dist/nrf5340dk/`.
+This port compiles and passes ARM emulation checks. Flash/readback, CDC, the Windows
+render endpoint, digital-silence USB playback and software ON/OFF/MUTE controls have
+been verified on a DK. **Version 0.1.11 has not paired with the tested Nucleus 7:**
+valid receiver beacons arrive, but no pairing confirmation follows transmitted replies.
+The latest [single-attempt trace](diagnostics/nucleus7-0.1.11/README.md) contains
+42 received beacons and 42 replies (the public copy replaces the receiver serial),
+no confirmation, no trace drops. The receiver was restarted and its first beacon
+arrived 12.035646 seconds before the pairing deadline. Audio heard through the
+processor and RF range remain unverified. `TESTS.json` records ARM emulation checks;
+USB/audio checks from earlier builds do not validate RF interoperability.
+The Pico instructions below describe the original implementation.
+
 **Stream your computer's sound straight to your hearing devices.**
 
 > **DISCLAIMER:** MiniMic Streamer is an independent project. It is not affiliated with, endorsed by or

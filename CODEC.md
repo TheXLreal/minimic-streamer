@@ -32,13 +32,29 @@ Contents
 
 | Setting | Value |
 |---|---|
-| Radio | nRF24L01+ (Enhanced ShockBurst framing, auto-ack off) |
+| Radio | nRF24L01+ (legacy ShockBurst framing: EN_AA=0, ARC=0, no 9-bit ESB packet-control field) |
 | Data rate | 2 Mbps |
 | Address | 4 bytes, `12 34 56 78` (in the order written to TX_ADDR). Each microphone has its own address. A receiver learns it when pairing (section 9). |
 | CRC | 2 bytes |
 | Payload | fixed 32 bytes |
 | Output power | -12 dBm (RF_SETUP = `0x0B`) |
 | CONFIG | `0x7E` (power up, TX, 2-byte CRC, all IRQs masked) |
+
+When implementing this link with a native nRF RADIO peripheral, omit S0/LENGTH/S1
+entirely and use STATLEN=MAXLEN=32. The original driver disables both EN_AA and
+automatic retries, which removes the ESB PCF; see Nordic's
+[explanation of nRF24L01+ ShockBurst compatibility](https://devzone.nordicsemi.com/f/nordic-q-a/37753/nrf52-receiving-data-from-24l01-incorrectly/145528).
+Adding the fixed ESB header produces address matches followed by CRC failures.
+
+The address arrays here use nRF24 SPI register order (least-significant byte first).
+Thus `12 34 56 78` goes on air as `78 56 34 12`, MSB first within each byte; see
+[Nordic's address-byte-order explanation](https://devzone.nordicsemi.com/f/nordic-q-a/612/nrf24l01-address-byte-order).
+For native RADIO with BALEN=3 this maps to BASE0=`0x2C6A1E00`, PREFIX0=`0x48`.
+RADIO transmits the used BASE bytes in order [15:8], [23:16], [31:24], then PREFIX,
+with bits LSB first inside each byte; see the nRF5340
+[packet configuration](https://docs.nordicsemi.com/r/bundle/ps_nrf5340/page/radio.html-concept_hz4_cjl_4r).
+Do not apply the ESB API's byte order directly to raw RADIO registers. The broadcast address
+`BC BC BC BC` cannot reveal a byte-order error, unlike the unicast pairing reply.
 
 ### Frame timing
 

@@ -1,0 +1,72 @@
+{
+  "started_utc": "2026-10-19T20:24:51.945311+00:00",
+  "firmware": "0.1.11",
+  "images_sha256": {
+    "minimic_app.hex": "735618f009f1ceead2492d7723fcc555558513d3282d6dca1b91a0d4ad929694",
+    "minimic_net.hex": "954054d3a483980fd0ee769587811187a3329ce76f698c5523e3d3f758ba1820"
+  },
+  "window": {
+    "host_utc": "2026-10-19T20:24:54.626571+00:00",
+    "network_start_us": 144781163,
+    "network_deadline_us": 174781163
+  },
+  "requested_delay_us": 5800,
+  "address_order_in_beacon": "spi",
+  "tx_packet_control_field": "none",
+  "counts": {
+    "1": 42,
+    "3": 42
+  },
+  "status": {
+    "pair_state": 4,
+    "pair_count": 0,
+    "beacons": 42,
+    "pair_replies": 42,
+    "trace_dropped": 0,
+    "faults": 0,
+    "late_frames": 0,
+    "rx_crc_ok": 42,
+    "rx_crc_bad": 0,
+    "rx_other": 0
+  },
+  "timing": {
+    "address_to_end_us": {
+      "min": 136,
+      "max": 137,
+      "median": 136.0
+    },
+    "txen_to_ready_us": {
+      "min": 130,
+      "max": 130,
+      "median": 130.0
+    },
+    "beacon_end_to_tx_address_us": {
+      "min": 5950,
+      "max": 5951,
+      "median": 5951.0
+    },
+    "beacon_end_to_tx_start_us": {
+      "min": 5931,
+      "max": 5931,
+      "median": 5931.0
+    }
+  },
+  "seconds_remaining_at_first_valid_beacon": 12.035646,
+  "at_least_10_seconds_of_receiver_packets_before_deadline": true,
+  "rx_byte3_counts": {
+    "1E": 42
+  },
+  "public_copy": {
+    "receiver_serial_replaced": true,
+    "replacement_ascii": "0000000000",
+    "rx_payload_byte_offsets": [
+      12,
+      21
+    ],
+    "tx_payload_byte_offsets": [
+      6,
+      15
+    ],
+    "other_payload_bytes_registers_timing_unchanged": true
+  }
+}

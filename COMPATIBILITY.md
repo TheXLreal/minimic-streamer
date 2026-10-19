@@ -36,6 +36,15 @@ this project is not affiliated with either company.
 
 ## Pico boards
 
+The nRF5340 DK port uses its built-in radio and has been compiled and checked in ARM emulation.
+Flash/readback, CDC and a Windows render endpoint have been verified on a DK.
+USB digital-silence playback and software ON/OFF/MUTE controls also pass on hardware.
+**nRF5340 DK v0.1.11 + Nucleus 7: pairing is currently unsuccessful.** Receiver beacons
+have valid CRC, but pairing replies produce no confirmation. Actual audio playback
+through the processor, hardware buttons, long-term stability and RF range are unverified.
+The hearing-device results above belong to the original Pico 2 W + nRF24L01+ firmware.
+See [NRF5340DK_RU.md](NRF5340DK_RU.md).
+
 | Board | Status | Notes |
 |---|---|---|
 | Pico 2 W | ✅ | |

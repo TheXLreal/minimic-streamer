@@ -3,3 +3,6 @@ dist/
 firmware/build*/
 # PC encoder tool (codec/README.md)
 codec/pc_encode
+build/
+third_party/
+__pycache__/

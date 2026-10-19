@@ -1,0 +1,6 @@
+MEMORY
+{
+  FLASH (rx) : ORIGIN = 0x01000000, LENGTH = 256K
+  RAM (rwx) : ORIGIN = 0x21000000, LENGTH = 64K
+}
+INCLUDE "nrf_common.ld"
