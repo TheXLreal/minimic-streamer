@@ -14,7 +14,9 @@ raspy distortion remains. Captured sessions show no local queue drops or radio f
 The current build is **0.1.15** (19 ARM emulation checks passed). It uses the requested updated audio HOP table:
 `{24,76,18,68,66,36,16,44,78,20,62,22,38,48,42,28}`. The full 48-frame hopping cycle
 is checked in ARM emulation. See the [build and HOP verification](diagnostics/nrf5340dk-0.1.15/README.md).
-Listening with this table has not yet been tested.
+Both cores have been programmed and readback verified on the DK. USB music playback
+runs without local starvation or faults in the captured session; the user tentatively
+reports better sound. Residual distortion and sustained stability are not yet confirmed.
 It retains +3 dBm audio, input PCM peaks and RADIO active between the two packets in a slot.
 Hardware traces verify nonzero codec data and a 6144-us frame period;
 [audio timing and listening diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md)

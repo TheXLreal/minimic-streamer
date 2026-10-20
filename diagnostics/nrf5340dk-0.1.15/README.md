@@ -31,8 +31,25 @@ The images are packaged locally in `dist/nrf5340dk/` and
 `dist/firmware-0.1.14/` before rebuilding. Previous hardware results remain under
 their original versions and image hashes; none are attributed to 0.1.15.
 
-Hardware flashing and listening are pending. Connect the DK through J2 / DEBUG
-USB with SW9 in VDD to program both new images. Then return the cable to J3 /
-nRF USB, select MiniMic Audio in Windows and Mini Microphone in the Nucleus app,
-and compare the same audio at the same volume and placement. Re-pairing is not
-expected to be necessary because the transmitter address has not changed.
+Both cores have now been programmed on the DK through J2 / DEBUG USB using
+Nordic nRF Util, with VERIFY_READ for both images and a final system reset.
+[HARDWARE.json](HARDWARE.json) records this partial validation for the exact image
+hashes. J3 now exposes a working Windows MiniMic Audio render endpoint and COM8;
+the running firmware reports 0.1.15 and the network core is ready.
+
+[USB_STATUS.json](USB_STATUS.json) records an eight-second capture during audio:
+1338 frames were encoded and transmitted, the queue stayed populated, and
+underflow, queue-drop, late-frame and radio-fault counters did not increase. Input
+PCM peaks ranged from 249 to 10201. The configuration remained +3 dBm / AUDIOGAP 0.
+These are local transmitter observations, not receiver audio acknowledgements.
+The status field `paired=0` counts confirmations since the latest board boot;
+it does not query the receiver's saved pairing.
+
+The user tentatively reports that audio seems better with 0.1.15. Remaining
+distortion and continuity are awaiting clarification. This is a preliminary
+listening improvement, not a confirmed solution to the quality problem.
+
+Return the cable to J3 / nRF USB, select MiniMic Audio in Windows and Mini
+Microphone in the Nucleus app, and compare the same audio at the same volume and
+placement. Re-pairing is not expected to be necessary because the transmitter
+address has not changed.

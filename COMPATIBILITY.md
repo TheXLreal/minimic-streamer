@@ -46,7 +46,9 @@ Microphone in the Nucleus app enables audible audio. External antenna #1 stopped
 the long dropouts in the user's listening test, but muffled and robotic/raspy
 distortion remains. See [audio diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md).
 Version 0.1.15 uses the requested updated audio HOP table (indices 3, 7 and 8
-changed); receiver listening with this table has not yet been tested.
+changed). Both cores are programmed and readback verified, and USB audio is active.
+The user tentatively reports better sound; residual distortion and sustained
+stability remain unconfirmed. See [0.1.15 results](diagnostics/nrf5340dk-0.1.15/README.md).
 Hardware buttons, long-term stability
 and RF range remain unverified.
 The hearing-device results above belong to the original Pico 2 W + nRF24L01+ firmware.

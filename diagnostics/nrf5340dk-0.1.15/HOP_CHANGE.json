@@ -61,10 +61,11 @@
     }
   ],
   "network_flash_other_bytes_identical": true,
-  "hardware_listening_tested": false,
+  "hardware_listening_tested": true,
   "images": {
     "minimic_app.hex": "b11cc023b2e71b7a347b50d9ac8355fcba8d1d0a37759e5e0e9830e381beea5a",
     "minimic_net.hex": "64f12faa613416912d77e3dce6bd328d4a12bdbe00c29ab35bbfcad84a579a67",
     "minimic_nrf5340dk.hex": "947ff89511bd9a1b58ec3c48ed64c6aa1485d2290c8f5fe6721ba972f7af0101"
-  }
+  },
+  "hardware_listening_result": "Preliminary user report: seems better; remaining distortion and continuity not yet clarified"
 }

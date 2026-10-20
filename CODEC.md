@@ -82,7 +82,8 @@ channel(slot) = HOP[(3*c + slot) mod 16]        slot = 0, 1, 2
 ```
 
 This updated table is used by nRF5340 DK firmware 0.1.15, following the supplied
-channel list; receiver listening validation is pending. nRF5340 versions through
+channel list; preliminary Nucleus 7 listening suggests improvement, while usable
+quality and sustained stability remain unconfirmed. nRF5340 versions through
 0.1.14 and the original Pico driver snapshot used 44, 78, 68 at zero-based indices
 3, 7, 8 respectively, where the updated table uses 68, 44, 78.
 
