@@ -4,13 +4,13 @@
 Build with `tools/build-nrf5340.ps1`; the two-core firmware is in `dist/nrf5340dk/`.
 This port compiles and passes ARM emulation checks. Flash/readback, CDC, the Windows
 render endpoint, digital-silence USB playback and software ON/OFF/MUTE controls have
-been verified on a DK. **Version 0.1.11 has not paired with the tested Nucleus 7:**
-valid receiver beacons arrive, but no pairing confirmation follows transmitted replies.
-The latest [single-attempt trace](diagnostics/nucleus7-0.1.11/README.md) contains
-42 received beacons and 42 replies (the public copy replaces the receiver serial),
-no confirmation, no trace drops. The receiver was restarted and its first beacon
-arrived 12.035646 seconds before the pairing deadline. Audio heard through the
-processor and RF range remain unverified. `TESTS.json` records ARM emulation checks;
+been verified on a DK. **Version 0.1.12 paired with the tested Nucleus 7:**
+the [successful trace](diagnostics/nucleus7-0.1.12/README.md) contains eight addressed
+`0x16` confirmations after four replies. It used +3 dBm and a READY/START delay sweep;
+the last reply started at 6001 us after beacon END. **Computer audio is not yet heard
+through the processor**, although USB audio reaches the DK without drops or faults.
+The public logs replace the receiver serial. The [previous unsuccessful trace](diagnostics/nucleus7-0.1.11/README.md)
+remains available. RF range is unverified. `TESTS.json` records ARM emulation checks;
 USB/audio checks from earlier builds do not validate RF interoperability.
 The Pico instructions below describe the original implementation.
 

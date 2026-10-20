@@ -1,3 +1,3 @@
 #pragma once
-#define MINIMIC_FW_VERSION "0.1.11"
-#define MINIMIC_BCD_DEVICE 0x0111
+#define MINIMIC_FW_VERSION "0.1.12"
+#define MINIMIC_BCD_DEVICE 0x0112

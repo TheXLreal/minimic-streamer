@@ -41,6 +41,7 @@ static void trace_task(void) {
             "BASE0=0x%08lX BASE1=0x%08lX PREFIX0=0x%08lX PREFIX1=0x%08lX TXADDRESS=0x%08lX "
             "PCNF0=0x%08lX PCNF1=0x%08lX CRCCNF=0x%08lX CRCINIT=0x%08lX CRCPOLY=0x%08lX "
             "MODE=0x%08lX FREQUENCY=0x%08lX TXPOWER=0x%08lX RXADDRESSES=0x%08lX SHORTS=0x%08lX "
+            "VREQH=0x%08lX VREQHREADY=0x%08lX target_start_us=%lu sweep_step=%lu "
             "crc_status=%lu rssi=-%lu header=%04lX data=%s\r\n",
             (unsigned long)t.kind, (unsigned long)t.channel, (unsigned long)t.task_us,
             (unsigned long)t.ready_us, (unsigned long)t.address_us, (unsigned long)t.end_us,
@@ -49,7 +50,9 @@ static void trace_task(void) {
             (unsigned long)t.pcnf0, (unsigned long)t.pcnf1, (unsigned long)t.crccnf,
             (unsigned long)t.crcinit, (unsigned long)t.crcpoly, (unsigned long)t.mode,
             (unsigned long)t.channel, (unsigned long)t.txpower, (unsigned long)t.rxaddresses,
-            (unsigned long)t.shorts, (unsigned long)t.crc, (unsigned long)t.rssi,
+            (unsigned long)t.shorts, (unsigned long)t.vreqh, (unsigned long)t.vreqhready,
+            (unsigned long)t.target_start_us, (unsigned long)t.sweep_step,
+            (unsigned long)t.crc, (unsigned long)t.rssi,
             (unsigned long)t.header, hex)) return;
         __DMB(); IPC->trace_tail = (tail + 1) % RF_TRACE_RING;
     }

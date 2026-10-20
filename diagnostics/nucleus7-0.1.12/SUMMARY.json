@@ -1,0 +1,174 @@
+{
+  "started_utc": "2026-10-20T12:58:38.070498+00:00",
+  "firmware": "0.1.12",
+  "images_sha256": {
+    "minimic_app.hex": "2c5853d8afc71a19d23c7e6f558575eb73afd40974e775c2bc6549a86c84c05a",
+    "minimic_net.hex": "c1cc877943c6cbd1e0e8b30915673f89214f099df025e88471921ffb0724b9e2"
+  },
+  "window": {
+    "host_utc": "2026-10-20T12:58:41.032694+00:00",
+    "network_start_us": 13003223,
+    "network_deadline_us": 43003223
+  },
+  "requested_delay_us": 5800,
+  "requested_tx_dbm": 3,
+  "start_delay_sweep_us": [
+    5950,
+    6000,
+    6050,
+    6100,
+    6150,
+    6200
+  ],
+  "replies_per_step": 3,
+  "address_order_in_beacon": "spi",
+  "tx_packet_control_field": "none",
+  "counts": {
+    "1": 31,
+    "3": 4,
+    "2": 1
+  },
+  "status": {
+    "pair_state": 3,
+    "pair_count": 1,
+    "beacons": 31,
+    "pair_replies": 4,
+    "trace_dropped": 0,
+    "faults": 0,
+    "late_frames": 0,
+    "rx_crc_ok": 31,
+    "rx_crc_bad": 1,
+    "rx_other": 0
+  },
+  "timing": {
+    "address_to_end_us": {
+      "min": 136,
+      "max": 137,
+      "median": 136.0
+    },
+    "txen_to_ready_us": {
+      "min": 130,
+      "max": 130,
+      "median": 130.0
+    },
+    "beacon_end_to_tx_address_us": {
+      "min": 5971,
+      "max": 6021,
+      "median": 5971.0
+    },
+    "beacon_end_to_tx_start_us": {
+      "min": 5951,
+      "max": 6001,
+      "median": 5951.0
+    }
+  },
+  "seconds_remaining_at_first_valid_beacon": 7.865425,
+  "at_least_10_seconds_of_receiver_packets_before_deadline": false,
+  "rx_byte3_counts": {
+    "1E": 23,
+    "16": 8
+  },
+  "rx_rssi_dbm": {
+    "min": -88,
+    "max": -67
+  },
+  "sweep_results": [
+    {
+      "step": 0,
+      "target_start_us": 5950,
+      "replies": 3,
+      "actual_start_min_us": 5951,
+      "actual_start_max_us": 5951,
+      "error_min_us": 1,
+      "error_max_us": 1
+    },
+    {
+      "step": 1,
+      "target_start_us": 6000,
+      "replies": 1,
+      "actual_start_min_us": 6001,
+      "actual_start_max_us": 6001,
+      "error_min_us": 1,
+      "error_max_us": 1
+    }
+  ],
+  "confirmation_context": [
+    {
+      "rx_seq": 9,
+      "rx_end_us": 35804677,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 68173
+    },
+    {
+      "rx_seq": 10,
+      "rx_end_us": 35878707,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 142203
+    },
+    {
+      "rx_seq": 11,
+      "rx_end_us": 36101702,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 365198
+    },
+    {
+      "rx_seq": 12,
+      "rx_end_us": 36399326,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 662822
+    },
+    {
+      "rx_seq": 13,
+      "rx_end_us": 36473056,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 736552
+    },
+    {
+      "rx_seq": 14,
+      "rx_end_us": 36843512,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 1107008
+    },
+    {
+      "rx_seq": 15,
+      "rx_end_us": 37066805,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 1330301
+    },
+    {
+      "rx_seq": 16,
+      "rx_end_us": 37511891,
+      "preceding_tx_seq": 8,
+      "preceding_target_start_us": 6000,
+      "preceding_sweep_step": 1,
+      "preceding_tx_end_to_rx_end_us": 1775387
+    }
+  ],
+  "public_copy": {
+    "receiver_serial_replaced": true,
+    "replacement_ascii": "0000000000",
+    "rx_payload_byte_offsets": [
+      12,
+      21
+    ],
+    "tx_payload_byte_offsets": [
+      6,
+      15
+    ],
+    "other_payload_bytes_registers_timing_unchanged": true
+  }
+}

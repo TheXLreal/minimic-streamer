@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include "nrf.h"
 #include "nrfx_config.h"
-#define IPC_MAGIC 0x4D4D5307u /* Includes the mailbox ABI version. */
+#define IPC_MAGIC 0x4D4D5308u /* Includes the mailbox ABI version. */
 #define IPC_RING 32u
 #define RF_TRACE_RING 256u
 #define FRAME_US 6144u
@@ -13,6 +13,7 @@ typedef struct {
     uint32_t kind, channel, task_us, ready_us, address_us, end_us, reference_us;
     uint32_t base, prefix, crc, rssi, pcnf0, pcnf1, mode, header;
     uint32_t base1, prefix1, txaddress, crccnf, crcinit, crcpoly, txpower, rxaddresses, shorts;
+    uint32_t vreqh, vreqhready, target_start_us, sweep_step;
     uint8_t payload[32];
 } rf_trace_t;
 typedef struct {
@@ -21,6 +22,8 @@ typedef struct {
     volatile uint32_t pair_delay_us; /* 0: scan around original nRF24 timing. */
     volatile uint32_t pair_address_order; /* Diagnostic: 0 SPI order, 1 on-air order in beacon. */
     volatile uint32_t pair_pcf; /* Diagnostic TX-only PCF: 0 none, 1 fixed, 2/3 length=32. */
+    volatile uint32_t pair_start_sweep; /* Diagnostic: six READY/START targets, three replies each. */
+    volatile uint32_t pair_tx_dbm; /* Diagnostic pairing power: 0 or +3 via VREQCTRL. */
     /* Debugger-only opt-in permits RF without USB while powered through J2.
      * Both fields reset at boot; normal operation still requires USB J3. */
     volatile uint32_t debug_radio, trace_enabled, trace_tail;

@@ -50,7 +50,7 @@ class NetMachine:
     MAILBOX = 0x20070000
 
     def __init__(self, enabled=1, usb=1, muted=0, epoch=0, pair_request=0, pair_desired=0,
-                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0):
+                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0, pair_start_sweep=0, pair_tx_dbm=0, high_voltage_ready=1):
         self.uc = Uc(UC_ARCH_ARM, UC_MODE_THUMB | UC_MODE_MCLASS)
         self.uc.ctl_set_cpu_model(UC_CPU_ARM_CORTEX_M33)
         for base, size in ((0x01000000, 0x40000), (0x21000000, 0x10000),
@@ -67,13 +67,16 @@ class NetMachine:
         self.tx_addresses = []
         self.tx_references = []
         self.tx_headers = []
+        self.tx_power = []
         self.stop_condition = lambda: False
         self.rx_action = None
-        self.write('magic', 0x4D4D5307)
+        self.write('magic', 0x4D4D5308)
+        self.put(0x41004508, high_voltage_ready)
         for name, value in dict(enabled=enabled, usb_ready=usb, muted=muted, epoch=epoch,
                                 pair_request=pair_request, pair_desired=pair_desired, pair_delay_us=pair_delay_us,
                                 debug_radio=debug_radio, trace_enabled=trace_enabled,
-                                pair_address_order=pair_address_order, pair_pcf=pair_pcf).items():
+                                pair_address_order=pair_address_order, pair_pcf=pair_pcf,
+                                pair_start_sweep=pair_start_sweep, pair_tx_dbm=pair_tx_dbm).items():
             self.write(name, value)
         at = self.syms['platform_init'][0] & ~1
         self.uc.hook_add(UC_HOOK_CODE, self.code, begin=at, end=at)
@@ -114,10 +117,10 @@ class NetMachine:
         self.put(self.RADIO + 0x104, 1)  # ADDRESS
         self.put(self.RADIO + 0x10C, 1)  # END
         self.put(self.RADIO + 0x110, 1)  # DISABLED
-        self.put(0x4100C544, self.now + 124)  # READY -> CC[1]
-        self.put(0x4100C548, self.now + 144)  # ADDRESS -> CC[2]
-        self.put(0x4100C54C, self.now + 280)  # END -> CC[3]
-        self.now += 280
+        self.put(0x4100C544, self.now + 130)  # READY -> CC[1]
+        self.put(0x4100C548, self.now + 150)  # ADDRESS -> CC[2]
+        self.put(0x4100C54C, self.now + 286)  # END -> CC[3]
+        self.now += 286
 
     def mmio(self, uc, access, address, size, value, data):
         offset = address - self.RADIO
@@ -128,10 +131,11 @@ class NetMachine:
             self.packets.append((self.now, self.word(self.RADIO + 0x508), bytes(uc.mem_read(ptr + header_len, 32))))
             self.tx_addresses.append((self.word(self.RADIO + 0x51C), self.word(self.RADIO + 0x524)))
             self.tx_references.append(self.word(self.syms['pair_reference_us'][0]))
-            self.put(0x4100C544, self.now + 124)
-            self.put(0x4100C548, self.now + 144)
-            self.put(0x4100C54C, self.now + 280)
-            self.now += 280
+            self.tx_power.append((self.word(self.RADIO + 0x50C), self.word(0x41004500), self.word(0x41004508)))
+            self.put(0x4100C544, self.now + 130)
+            self.put(0x4100C548, self.now + 150)
+            self.put(0x4100C54C, self.now + 286)
+            self.now += 286
             self.put(self.RADIO + 0x10C, 1)
             self.put(self.RADIO + 0x110, 1)
         elif offset == 4 and value and self.rx_action:  # RXEN
@@ -298,7 +302,7 @@ class FirmwareTests(unittest.TestCase):
         self.assertEqual(machine.read('active'), 0)
         self.assertEqual(machine.read('trace_head'), 3)
         trace_base = machine.MAILBOX + machine.fields['trace']
-        confirmation_trace = struct.unpack('<24I32s', machine.uc.mem_read(trace_base + 256, 128))
+        confirmation_trace = struct.unpack('<28I32s', machine.uc.mem_read(trace_base + 288, 144))
         self.assertEqual(confirmation_trace[0], 1)
         self.assertEqual(confirmation_trace[-1][3], 0x16, 'Confirmation must be logged before pairing handles it')
         machine.write('pair_desired', 0)
@@ -348,11 +352,11 @@ class FirmwareTests(unittest.TestCase):
         machine.rx_action = receive
         machine.run(lambda: machine.read('pair_replies') == 1)
         self.assertEqual(machine.read('trace_head'), 2)
-        # struct rf_trace_t: 24 words + 32-byte payload. The first RX record
+        # struct rf_trace_t: 28 words + 32-byte payload. The first RX record
         # must survive re-arming RX (which clears DMA and changes timestamps).
         base = machine.MAILBOX + machine.fields['trace']
-        rx = struct.unpack('<24I32s', machine.uc.mem_read(base, 128))
-        tx = struct.unpack('<24I32s', machine.uc.mem_read(base + 128, 128))
+        rx = struct.unpack('<28I32s', machine.uc.mem_read(base, 144))
+        tx = struct.unpack('<28I32s', machine.uc.mem_read(base + 144, 144))
         self.assertEqual(rx[0], 1)
         self.assertEqual(rx[-1], bytes(beacon))
         self.assertEqual(tx[0], 3)
@@ -383,6 +387,51 @@ class FirmwareTests(unittest.TestCase):
         self.assertEqual(machine.word(0x4100C0C8), 0x80000001)
         self.assertEqual(machine.word(0x4100C0CC), 0x80000002)
         self.assertEqual(machine.word(0x4100F504), 7)
+
+    def test_ready_start_sweep_and_high_voltage_power(self):
+        machine = NetMachine(pair_request=1, pair_desired=1, trace_enabled=1,
+                             pair_start_sweep=1, pair_tx_dbm=3)
+        beacon = bytearray(32)
+        beacon[3:5] = b'\x1e\x03'
+        beacon[8:12] = bytes.fromhex('DEADBEEF')
+        beacon[28:30] = b'\x80\x43'
+        machine.rx_action = lambda m: m.inject_rx(bytes(beacon))
+        machine.run(lambda: machine.read('pair_replies') == 36)
+        self.assertEqual(machine.tx_power, [(0, 1, 1)] * 36,
+                         '+3 dBm requires TXPOWER=0 and high radio voltage ready before every reply')
+        base = machine.MAILBOX + machine.fields['trace']
+        records = [struct.unpack('<28I32s', machine.uc.mem_read(base + index * 144, 144))
+                   for index in range(machine.read('trace_head'))]
+        replies = [record for record in records if record[0] == 3]
+        targets = [5950, 6000, 6050, 6100, 6150, 6200]
+        self.assertEqual(len(replies), 36)
+        from capture_rf_swd import KEYS, text_record
+        for index, record in enumerate(replies):
+            step = (index // 3) % 6
+            target = targets[step]
+            self.assertEqual(record[24:28], (1, 1, target, step))
+            actual_start = (record[3] - record[6]) & 0xFFFFFFFF
+            self.assertGreaterEqual(actual_start, target)
+            self.assertLessEqual(actual_start, target + 16)
+            self.assertEqual((record[3] - record[2]) & 0xFFFFFFFF, 130)
+            formatted = dict(zip(KEYS, record))
+            formatted['payload'] = record[-1].hex().upper()
+            line = text_record(formatted, index + 1)
+            self.assertIn('configured_tx_dbm=3', line)
+            self.assertIn(f'target_start_us={target}', line)
+            self.assertIn(f'start_error_us={actual_start - target}', line)
+        machine.write('pair_desired', 0)
+        machine.write('pair_request', 2)
+        machine.run(lambda: machine.read('pair_state') == 5)
+        self.assertEqual(machine.word(0x41004500), 0, 'High voltage must be released after pairing')
+
+    def test_high_voltage_not_ready_cancels_pairing(self):
+        machine = NetMachine(pair_request=1, pair_desired=1, pair_tx_dbm=3, high_voltage_ready=0)
+        machine.run(lambda: machine.read('pair_state') == 5)
+        self.assertEqual(machine.read('faults'), 1)
+        self.assertEqual(machine.read('pair_replies'), 0)
+        self.assertEqual(machine.tx_power, [])
+        self.assertEqual(machine.word(0x41004500), 0)
 
     def test_full_trace_buffer_never_stalls_radio(self):
         machine = NetMachine(trace_enabled=1, pair_request=1, pair_desired=1)
@@ -477,7 +526,7 @@ class FirmwareTests(unittest.TestCase):
         self.assertEqual(machine.read('beacons'), 0)
         self.assertEqual(machine.read('trace_head'), 2)
         base = machine.MAILBOX + machine.fields['trace']
-        records = [struct.unpack('<24I32s', machine.uc.mem_read(base + index * 128, 128)) for index in range(2)]
+        records = [struct.unpack('<28I32s', machine.uc.mem_read(base + index * 144, 144)) for index in range(2)]
         self.assertEqual([record[0] for record in records], [2, 1])
         self.assertEqual([record[-1] for record in records], [bytes(32), bytes(32)],
                          'RX logging must retain bad CRC and non-beacon packets without a byte-3 filter')

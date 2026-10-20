@@ -6,6 +6,7 @@
 
 static uint8_t dma[34] __attribute__((aligned(4)));
 static uint32_t rx_task_us, pair_reference_us;
+static uint32_t pair_target_start_us, pair_sweep_step;
 static bool permitted(void) { return (IPC->usb_ready || IPC->debug_radio) && IPC->enabled; }
 static void trace_packet(uint32_t kind, uint32_t task, uint32_t reference) {
     if (!IPC->trace_enabled) return;
@@ -26,6 +27,10 @@ static void trace_packet(uint32_t kind, uint32_t task, uint32_t reference) {
     t->crccnf = NRF_RADIO->CRCCNF; t->crcinit = NRF_RADIO->CRCINIT;
     t->crcpoly = NRF_RADIO->CRCPOLY; t->txpower = NRF_RADIO->TXPOWER;
     t->rxaddresses = NRF_RADIO->RXADDRESSES; t->shorts = NRF_RADIO->SHORTS;
+    t->vreqh = NRF_VREQCTRL_NS->VREGRADIO.VREQH;
+    t->vreqhready = NRF_VREQCTRL_NS->VREGRADIO.VREQHREADY;
+    t->target_start_us = kind >= RF_TX_OK ? pair_target_start_us : 0;
+    t->sweep_step = kind >= RF_TX_OK ? pair_sweep_step : UINT32_MAX;
     bool header = kind >= RF_TX_OK && NRF_RADIO->PCNF0 != 0;
     t->header = header ? ((uint32_t)dma[0] << 8) | dma[1] : 0;
     memcpy(t->payload, dma + (header ? 2 : 0), 32);
@@ -46,6 +51,7 @@ static void rf_address(const uint8_t addr[4]) {
     NRF_RADIO->PREFIX0 = mm_radio_prefix(addr);
 }
 static void rf_init(void) {
+    NRF_VREQCTRL_NS->VREGRADIO.VREQH = VREQCTRL_VREGRADIO_VREQH_VREQH_Disabled;
     NRF_RADIO->POWER = 1;
     NRF_RADIO->MODE = RADIO_MODE_MODE_Nrf_2Mbit;
     NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
@@ -147,12 +153,33 @@ static void discard_queue(void) {
     IPC->tail = IPC->head;
     __DMB(); IPC->epoch_ack = IPC->epoch;
 }
+static bool pair_power(bool high) {
+    /* nRF5340 PS: TXPOWER=0 + VREQH=1 gives +3 dBm. Positive TXPOWER
+     * enumerators are not supported on this SoC. Wait before enabling RADIO. */
+    NRF_VREQCTRL_NS->VREGRADIO.VREQH = high ?
+        VREQCTRL_VREGRADIO_VREQH_VREQH_Enabled : VREQCTRL_VREGRADIO_VREQH_VREQH_Disabled;
+    if (!high) return true;
+    uint32_t deadline = micros() + 1000;
+    while (!(NRF_VREQCTRL_NS->VREGRADIO.VREQHREADY & VREQCTRL_VREGRADIO_VREQHREADY_READY_Msk)) {
+        if (due(micros(), deadline)) {
+            IPC->faults++;
+            NRF_VREQCTRL_NS->VREGRADIO.VREQH = VREQCTRL_VREGRADIO_VREQH_VREQH_Disabled;
+            return false;
+        }
+    }
+    return true;
+}
 static void pairing(void) {
     uint8_t done[16][4]; unsigned n = 0;
     IPC->active = 0; IPC->pair_count = 0; IPC->beacons = 0;
     IPC->pair_replies = 0; IPC->pair_last_delay = 0;
     IPC->pair_state = PAIR_SEARCH;
     discard_queue();
+    pair_target_start_us = 0; pair_sweep_step = UINT32_MAX;
+    if (!rf_off() || !pair_power(IPC->pair_tx_dbm == 3)) {
+        IPC->pair_state = PAIR_CANCELLED;
+        return;
+    }
     IPC->pair_started_us = micros();
     uint32_t end = IPC->pair_started_us + 30000000;
     IPC->pair_deadline_us = end;
@@ -184,7 +211,17 @@ static void pairing(void) {
                  * Try one reply per request; never fill the receiver's window
                  * with a burst. A fixed delay can be selected over CDC. */
                 uint32_t delay = IPC->pair_delay_us;
-                if (delay < 1000 || delay > 20000) {
+                if (IPC->pair_start_sweep) {
+                    /* Target the beginning of transmission, not ADDRESS or
+                     * TXEN. The previous hardware trace measured TXEN->READY
+                     * at 130 us. Log both requested and actual READY timing;
+                     * CPU polling may add a few microseconds. Repeat cyclically
+                     * so each target gets three replies within one window. */
+                    static const uint16_t starts[] = {5950, 6000, 6050, 6100, 6150, 6200};
+                    pair_sweep_step = (IPC->pair_replies / 3) % 6;
+                    pair_target_start_us = starts[pair_sweep_step];
+                    delay = pair_target_start_us - 130;
+                } else if (delay < 1000 || delay > 20000) {
                     unsigned i = IPC->pair_replies % 41;
                     int offset = (int)((i + 1) / 2) * 100;
                     delay = (uint32_t)(5800 + (i & 1 ? offset : -offset));
@@ -200,6 +237,7 @@ static void pairing(void) {
         if (cancelled) break;
     }
     rf_off();
+    pair_power(false);
     IPC->pair_ack = IPC->pair_request;
     IPC->pair_state = cancelled ? PAIR_CANCELLED : IPC->pair_count ? PAIR_DONE : PAIR_TIMEOUT;
     discard_queue();
