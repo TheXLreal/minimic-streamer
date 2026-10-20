@@ -50,7 +50,7 @@ class NetMachine:
     MAILBOX = 0x20070000
 
     def __init__(self, enabled=1, usb=1, muted=0, epoch=0, pair_request=0, pair_desired=0,
-                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0, pair_start_sweep=0, pair_tx_dbm=0, high_voltage_ready=1):
+                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0, pair_start_sweep=0, pair_tx_dbm=0, high_voltage_ready=1, tx_dbm=0, trace_audio_frames=0):
         self.uc = Uc(UC_ARCH_ARM, UC_MODE_THUMB | UC_MODE_MCLASS)
         self.uc.ctl_set_cpu_model(UC_CPU_ARM_CORTEX_M33)
         for base, size in ((0x01000000, 0x40000), (0x21000000, 0x10000),
@@ -70,13 +70,14 @@ class NetMachine:
         self.tx_power = []
         self.stop_condition = lambda: False
         self.rx_action = None
-        self.write('magic', 0x4D4D5308)
+        self.write('magic', 0x4D4D5309)
         self.put(0x41004508, high_voltage_ready)
         for name, value in dict(enabled=enabled, usb_ready=usb, muted=muted, epoch=epoch,
                                 pair_request=pair_request, pair_desired=pair_desired, pair_delay_us=pair_delay_us,
                                 debug_radio=debug_radio, trace_enabled=trace_enabled,
                                 pair_address_order=pair_address_order, pair_pcf=pair_pcf,
-                                pair_start_sweep=pair_start_sweep, pair_tx_dbm=pair_tx_dbm).items():
+                                pair_start_sweep=pair_start_sweep, pair_tx_dbm=pair_tx_dbm,
+                                tx_dbm=tx_dbm, trace_audio_frames=trace_audio_frames).items():
             self.write(name, value)
         at = self.syms['platform_init'][0] & ~1
         self.uc.hook_add(UC_HOOK_CODE, self.code, begin=at, end=at)
@@ -431,6 +432,32 @@ class FirmwareTests(unittest.TestCase):
         self.assertEqual(machine.read('faults'), 1)
         self.assertEqual(machine.read('pair_replies'), 0)
         self.assertEqual(machine.tx_power, [])
+        self.assertEqual(machine.word(0x41004500), 0)
+
+    def test_audio_trace_and_runtime_power(self):
+        machine = NetMachine(tx_dbm=3, trace_enabled=1, trace_audio_frames=2)
+        machine.run(lambda: machine.read('tx_frames') == 2)
+        self.assertEqual(machine.tx_power, [(0, 1, 1)] * 10)
+        self.assertEqual(machine.read('trace_audio_frames'), 0)
+        self.assertEqual(machine.read('trace_head'), 10)
+        base = machine.MAILBOX + machine.fields['trace']
+        records = [struct.unpack('<28I32s', machine.uc.mem_read(base + index * 144, 144)) for index in range(10)]
+        self.assertTrue(all(record[0] == 5 for record in records))
+        self.assertEqual([record[-1][0] for record in records], [0x18, 0x39, 0x19, 0x38, 0x1A] * 2)
+        self.assertEqual([record[24:28] for record in records], [(1, 1, 0, 0xFFFFFFFF)] * 10)
+        from capture_rf_swd import KEYS, text_record
+        formatted = dict(zip(KEYS, records[0]))
+        formatted['payload'] = records[0][-1].hex().upper()
+        text = text_record(formatted, 1)
+        self.assertIn('result=END configured_tx_dbm=3', text)
+        self.assertIn('frame_epoch_us=', text)
+        self.assertNotIn('beacon_rx_end_us=', text)
+        machine.write('tx_dbm', 0)
+        machine.run(lambda: machine.read('tx_frames') == 4)
+        self.assertEqual(machine.tx_power[10:], [(0, 0, 1)] * 10)
+        self.assertEqual(machine.read('trace_head'), 10, 'Audio trace must stop after the requested frame count')
+        machine.write('enabled', 0)
+        machine.run(lambda: machine.read('active') == 0)
         self.assertEqual(machine.word(0x41004500), 0)
 
     def test_full_trace_buffer_never_stalls_radio(self):

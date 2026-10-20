@@ -3,12 +3,12 @@
 #include <stddef.h>
 #include "nrf.h"
 #include "nrfx_config.h"
-#define IPC_MAGIC 0x4D4D5308u /* Includes the mailbox ABI version. */
+#define IPC_MAGIC 0x4D4D5309u /* Includes the mailbox ABI version. */
 #define IPC_RING 32u
 #define RF_TRACE_RING 256u
 #define FRAME_US 6144u
 enum { PAIR_IDLE, PAIR_SEARCH, PAIR_REPLY, PAIR_DONE, PAIR_TIMEOUT, PAIR_CANCELLED };
-enum { RF_RX_OK = 1, RF_RX_BAD, RF_TX_OK, RF_TX_TIMEOUT };
+enum { RF_RX_OK = 1, RF_RX_BAD, RF_TX_OK, RF_TX_TIMEOUT, RF_AUDIO_TX, RF_AUDIO_TIMEOUT };
 typedef struct {
     uint32_t kind, channel, task_us, ready_us, address_us, end_us, reference_us;
     uint32_t base, prefix, crc, rssi, pcnf0, pcnf1, mode, header;
@@ -24,6 +24,7 @@ typedef struct {
     volatile uint32_t pair_pcf; /* Diagnostic TX-only PCF: 0 none, 1 fixed, 2/3 length=32. */
     volatile uint32_t pair_start_sweep; /* Diagnostic: six READY/START targets, three replies each. */
     volatile uint32_t pair_tx_dbm; /* Diagnostic pairing power: 0 or +3 via VREQCTRL. */
+    volatile uint32_t tx_dbm, trace_audio_frames; /* Normal RF power; bounded audio trace request. */
     /* Debugger-only opt-in permits RF without USB while powered through J2.
      * Both fields reset at boot; normal operation still requires USB J3. */
     volatile uint32_t debug_radio, trace_enabled, trace_tail;

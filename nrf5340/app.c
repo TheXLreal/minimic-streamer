@@ -96,14 +96,16 @@ static void status(void) {
     uint32_t ps = IPC->pair_state;
     log_line("[modem] fw=" MINIMIC_FW_VERSION " board=nrf5340dk radio=builtin usb=%lu enabled=%lu tx_active=%lu mute=%u "
         "mode=%s net=%s tx=%lu under=%lu drop=%lu late=%lu faults=%lu depth=%lu fifo=%lu "
-        "pair=%s paired=%lu beacons=%lu addr=12345678 rx=%02X%02X%02X%02X "
+        "tx_dbm=%lu pcm_peak=%lu encoded=%lu pair=%s paired=%lu beacons=%lu addr=12345678 rx=%02X%02X%02X%02X "
         "rx_addr=%lu crc_ok=%lu crc_bad=%lu rx_other=%lu replies=%lu delay_us=%lu\r\n",
         (unsigned long)IPC->usb_ready, (unsigned long)IPC->enabled, (unsigned long)IPC->active,
         user_mute, app_raw_active() ? "raw" : audio_streaming() ? "audio" : "idle",
         net_fault ? "fault" : IPC->ready == IPC_MAGIC ? "ready" : "starting",
         (unsigned long)IPC->tx_frames, (unsigned long)IPC->underflows, (unsigned long)drops,
         (unsigned long)IPC->late_frames, (unsigned long)IPC->faults, (unsigned long)queue_depth(),
-        (unsigned long)audio_fifo(), ps < sizeof states / sizeof states[0] ? states[ps] : "invalid",
+        (unsigned long)audio_fifo(), (unsigned long)IPC->tx_dbm,
+        (unsigned long)audio_pcm_peak(), (unsigned long)audio_encoded_frames(),
+        ps < sizeof states / sizeof states[0] ? states[ps] : "invalid",
         (unsigned long)IPC->pair_count, (unsigned long)IPC->beacons,
         IPC->paired_id[0], IPC->paired_id[1], IPC->paired_id[2], IPC->paired_id[3],
         (unsigned long)IPC->rx_addresses, (unsigned long)IPC->rx_crc_ok,
@@ -129,9 +131,21 @@ static void command(const char *line) {
             log_line("[control] pair_delay_us=%lu (0=auto)\r\n", value);
         }
     }
+    else if (!strncmp(line, "TXPOWER ", 8)) {
+        char *end; unsigned long value = strtoul(line + 8, &end, 10);
+        if (end == line + 8 || *end || (value != 0 && value != 3))
+            log_line("[error] TXPOWER 0 or 3 dBm\r\n");
+        else { IPC->tx_dbm = value; log_line("[control] tx_dbm=%lu\r\n", value); }
+    }
+    else if (!strncmp(line, "TRACEAUDIO ", 11)) {
+        char *end; unsigned long value = strtoul(line + 11, &end, 10);
+        if (end == line + 11 || *end || value < 1 || value > 16 || pairing_active())
+            log_line("[error] TRACEAUDIO 1..16 frames, outside pairing\r\n");
+        else { IPC->trace_audio_frames = value; log_line("[control] trace_audio_frames=%lu\r\n", value); }
+    }
     else if (!strcmp(line, "REBOOT")) { IPC->enabled = 0; __DMB(); delay_us(8000); NVIC_SystemReset(); }
     else if (!strcmp(line, "HELP"))
-        log_line("[help] STATUS | ON | OFF | MUTE | UNMUTE | PAIR | CANCEL | PAIRDELAY <0|1000..20000> | MONITOR ON | MONITOR OFF | REBOOT\r\n");
+        log_line("[help] STATUS | ON | OFF | MUTE | UNMUTE | PAIR | CANCEL | PAIRDELAY <0|1000..20000> | TXPOWER <0|3> | TRACEAUDIO <1..16> | MONITOR ON | MONITOR OFF | REBOOT\r\n");
     else log_line("[error] unknown command; send HELP\r\n");
 }
 static void serial_task(void) {
@@ -256,7 +270,9 @@ int main(void) {
         NRF_SPU->RAMREGION[region].PERM = SPU_RAMREGION_PERM_READ_Msk | SPU_RAMREGION_PERM_WRITE_Msk;
     NRF_SPU->EXTDOMAIN[0].PERM = 0; /* Network bus is nonsecure; mailbox is nonsecure. */
     memset(IPC, 0, sizeof *IPC);
-    IPC->enabled = 1; IPC->trace_enabled = 1; IPC->magic = IPC_MAGIC; __DSB();
+    IPC->enabled = 1; IPC->trace_enabled = 1;
+    IPC->tx_dbm = 3; IPC->pair_tx_dbm = 3; IPC->pair_start_sweep = 1;
+    IPC->magic = IPC_MAGIC; __DSB();
     NRF_RESET->NETWORK.FORCEOFF = 0; __DSB();
     audio_init();
     NVIC_SetPriority(USBD_IRQn, 2);

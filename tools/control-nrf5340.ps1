@@ -3,6 +3,8 @@ param(
     [ValidateSet('STATUS','ON','OFF','MUTE','UNMUTE','PAIR','CANCEL','REBOOT','HELP','MONITOR ON','MONITOR OFF')]
     [string]$Command = 'STATUS',
     [ValidateRange(0,20000)][Nullable[uint32]]$PairDelayUs = $null,
+    [ValidateSet(0,3)][Nullable[uint32]]$TxPowerDbm = $null,
+    [ValidateRange(1,16)][Nullable[uint32]]$TraceAudioFrames = $null,
     [switch]$Watch
 )
 $ErrorActionPreference = 'Stop'
@@ -25,6 +27,8 @@ try {
         if ($PairDelayUs -gt 0 -and $PairDelayUs -lt 1000) { throw 'PairDelayUs must be 0 (auto) or 1000..20000.' }
         $serial.WriteLine("PAIRDELAY $PairDelayUs")
     }
+    if ($null -ne $TxPowerDbm) { $serial.WriteLine("TXPOWER $TxPowerDbm") }
+    if ($null -ne $TraceAudioFrames) { $serial.WriteLine("TRACEAUDIO $TraceAudioFrames") }
     $serial.WriteLine($Command)
     $stopAt = [DateTime]::UtcNow.AddSeconds(3)
     Write-Host "$Command sent to $Port. Ctrl+C stops watching."

@@ -7,6 +7,8 @@
 static uint8_t dma[34] __attribute__((aligned(4)));
 static uint32_t rx_task_us, pair_reference_us;
 static uint32_t pair_target_start_us, pair_sweep_step;
+static uint32_t audio_reference_us;
+static bool audio_trace_active;
 static bool permitted(void) { return (IPC->usb_ready || IPC->debug_radio) && IPC->enabled; }
 static void trace_packet(uint32_t kind, uint32_t task, uint32_t reference) {
     if (!IPC->trace_enabled) return;
@@ -29,8 +31,9 @@ static void trace_packet(uint32_t kind, uint32_t task, uint32_t reference) {
     t->rxaddresses = NRF_RADIO->RXADDRESSES; t->shorts = NRF_RADIO->SHORTS;
     t->vreqh = NRF_VREQCTRL_NS->VREGRADIO.VREQH;
     t->vreqhready = NRF_VREQCTRL_NS->VREGRADIO.VREQHREADY;
-    t->target_start_us = kind >= RF_TX_OK ? pair_target_start_us : 0;
-    t->sweep_step = kind >= RF_TX_OK ? pair_sweep_step : UINT32_MAX;
+    bool pair_tx = kind == RF_TX_OK || kind == RF_TX_TIMEOUT;
+    t->target_start_us = pair_tx ? pair_target_start_us : 0;
+    t->sweep_step = pair_tx ? pair_sweep_step : UINT32_MAX;
     bool header = kind >= RF_TX_OK && NRF_RADIO->PCNF0 != 0;
     t->header = header ? ((uint32_t)dma[0] << 8) | dma[1] : 0;
     memcpy(t->payload, dma + (header ? 2 : 0), 32);
@@ -104,10 +107,12 @@ static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr
         if (due(micros(), end)) {
             IPC->faults++; rf_off();
             if (IPC->pair_state == PAIR_REPLY) trace_packet(RF_TX_TIMEOUT, task, pair_reference_us);
+            else if (audio_trace_active) trace_packet(RF_AUDIO_TIMEOUT, task, audio_reference_us);
             return false;
         }
     }
     if (IPC->pair_state == PAIR_REPLY) trace_packet(RF_TX_OK, task, pair_reference_us);
+    else if (audio_trace_active) trace_packet(RF_AUDIO_TX, task, audio_reference_us);
     return true;
 }
 static void rx_start(uint8_t channel) {
@@ -153,9 +158,12 @@ static void discard_queue(void) {
     IPC->tail = IPC->head;
     __DMB(); IPC->epoch_ack = IPC->epoch;
 }
-static bool pair_power(bool high) {
+static bool radio_power(bool high) {
     /* nRF5340 PS: TXPOWER=0 + VREQH=1 gives +3 dBm. Positive TXPOWER
      * enumerators are not supported on this SoC. Wait before enabling RADIO. */
+    if ((NRF_VREQCTRL_NS->VREGRADIO.VREQH & 1u) == (unsigned)high &&
+        (!high || (NRF_VREQCTRL_NS->VREGRADIO.VREQHREADY & 1u))) return true;
+    if (!rf_off()) return false;
     NRF_VREQCTRL_NS->VREGRADIO.VREQH = high ?
         VREQCTRL_VREGRADIO_VREQH_VREQH_Enabled : VREQCTRL_VREGRADIO_VREQH_VREQH_Disabled;
     if (!high) return true;
@@ -176,7 +184,7 @@ static void pairing(void) {
     IPC->pair_state = PAIR_SEARCH;
     discard_queue();
     pair_target_start_us = 0; pair_sweep_step = UINT32_MAX;
-    if (!rf_off() || !pair_power(IPC->pair_tx_dbm == 3)) {
+    if (!rf_off() || !radio_power(IPC->pair_tx_dbm == 3)) {
         IPC->pair_state = PAIR_CANCELLED;
         return;
     }
@@ -237,7 +245,7 @@ static void pairing(void) {
         if (cancelled) break;
     }
     rf_off();
-    pair_power(false);
+    radio_power(IPC->tx_dbm == 3);
     IPC->pair_ack = IPC->pair_request;
     IPC->pair_state = cancelled ? PAIR_CANCELLED : IPC->pair_count ? PAIR_DONE : PAIR_TIMEOUT;
     discard_queue();
@@ -252,10 +260,14 @@ int main(void) {
         IPC->heartbeat++;
         if (!permitted()) {
             rf_off(); IPC->active = 0; discard_queue();
+            radio_power(false);
             IPC->pair_ack = IPC->pair_request;
             epoch = micros() + 2000; counter = 0;
             delay_us(100);
             continue;
+        }
+        if (!radio_power(IPC->tx_dbm == 3)) {
+            rf_off(); IPC->active = 0; delay_us(1000); continue;
         }
         if (IPC->pair_request != IPC->pair_ack) {
             IPC->pair_ack = IPC->pair_request;
@@ -265,6 +277,8 @@ int main(void) {
         }
         if (IPC->epoch != IPC->epoch_ack) discard_queue();
         IPC->active = 1;
+        audio_trace_active = IPC->trace_audio_frames != 0;
+        audio_reference_us = epoch;
         uint8_t fr[84], p[3][32], copy[32];
         bool have = IPC->head != IPC->tail;
         if (have) {
@@ -284,6 +298,8 @@ int main(void) {
             }
         }
         if (sent && permitted()) IPC->tx_frames++;
+        if (audio_trace_active && IPC->trace_audio_frames) IPC->trace_audio_frames--;
+        audio_trace_active = false;
         if (IPC->monitor && permitted()) {
             uint8_t ch = mm_pair_channels[(IPC->tx_frames / 100) % 4];
             rx_start(ch);
