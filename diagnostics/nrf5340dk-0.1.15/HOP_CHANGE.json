@@ -1,0 +1,70 @@
+{
+  "firmware": "0.1.15",
+  "previous_firmware": "0.1.14",
+  "address_spi_order": "12345678",
+  "hop_table": [
+    24,
+    76,
+    18,
+    68,
+    66,
+    36,
+    16,
+    44,
+    78,
+    20,
+    62,
+    22,
+    38,
+    48,
+    42,
+    28
+  ],
+  "previous_hop_table": [
+    24,
+    76,
+    18,
+    44,
+    66,
+    36,
+    16,
+    78,
+    68,
+    20,
+    62,
+    22,
+    38,
+    48,
+    42,
+    28
+  ],
+  "changed_zero_based_indices": [
+    3,
+    7,
+    8
+  ],
+  "verified_network_flash_changes": [
+    {
+      "address": "0x0100026B",
+      "previous": 44,
+      "updated": 68
+    },
+    {
+      "address": "0x0100026F",
+      "previous": 78,
+      "updated": 44
+    },
+    {
+      "address": "0x01000270",
+      "previous": 68,
+      "updated": 78
+    }
+  ],
+  "network_flash_other_bytes_identical": true,
+  "hardware_listening_tested": false,
+  "images": {
+    "minimic_app.hex": "b11cc023b2e71b7a347b50d9ac8355fcba8d1d0a37759e5e0e9830e381beea5a",
+    "minimic_net.hex": "64f12faa613416912d77e3dce6bd328d4a12bdbe00c29ab35bbfcad84a579a67",
+    "minimic_nrf5340dk.hex": "947ff89511bd9a1b58ec3c48ed64c6aa1485d2290c8f5fe6721ba972f7af0101"
+  }
+}

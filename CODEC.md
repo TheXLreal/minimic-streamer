@@ -77,9 +77,14 @@ Every slot uses its own RF channel (RF_CH value, i.e. 2400 + n MHz). With the fr
 `c` (0..47, see below):
 
 ```
-HOP = [24, 76, 18, 44, 66, 36, 16, 78, 68, 20, 62, 22, 38, 48, 42, 28]
+HOP = [24, 76, 18, 68, 66, 36, 16, 44, 78, 20, 62, 22, 38, 48, 42, 28]
 channel(slot) = HOP[(3*c + slot) mod 16]        slot = 0, 1, 2
 ```
+
+This updated table is used by nRF5340 DK firmware 0.1.15, following the supplied
+channel list; receiver listening validation is pending. nRF5340 versions through
+0.1.14 and the original Pico driver snapshot used 44, 78, 68 at zero-based indices
+3, 7, 8 respectively, where the updated table uses 68, 44, 78.
 
 The receiver follows the hop pattern using the counter inside each packet, so the counter in byte 1
 must match the channel used. The table above belongs to address `12 34 56 78`. The receiver derives

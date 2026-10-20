@@ -11,8 +11,11 @@ the last reply started at 6001 us after beacon END. With 0.1.14, the user **hear
 computer audio after selecting Mini Microphone in the Nucleus app**. With external
 antenna #1, the user reports that long dropouts stopped, but muffled and robotic/
 raspy distortion remains. Captured sessions show no local queue drops or radio faults.
-The current build is 0.1.14 (19 ARM emulation checks). It applies +3 dBm to audio,
-reports input PCM peaks, and keeps RADIO active between the two packets in a slot.
+The current build is **0.1.15** (19 ARM emulation checks passed). It uses the requested updated audio HOP table:
+`{24,76,18,68,66,36,16,44,78,20,62,22,38,48,42,28}`. The full 48-frame hopping cycle
+is checked in ARM emulation. See the [build and HOP verification](diagnostics/nrf5340dk-0.1.15/README.md).
+Listening with this table has not yet been tested.
+It retains +3 dBm audio, input PCM peaks and RADIO active between the two packets in a slot.
 Hardware traces verify nonzero codec data and a 6144-us frame period;
 [audio timing and listening diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md)
 record the unresolved quality/stability problem. The public logs replace the receiver serial.

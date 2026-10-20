@@ -45,6 +45,8 @@ see the [capture](diagnostics/nucleus7-0.1.12/README.md). With 0.1.14, selecting
 Microphone in the Nucleus app enables audible audio. External antenna #1 stopped
 the long dropouts in the user's listening test, but muffled and robotic/raspy
 distortion remains. See [audio diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md).
+Version 0.1.15 uses the requested updated audio HOP table (indices 3, 7 and 8
+changed); receiver listening with this table has not yet been tested.
 Hardware buttons, long-term stability
 and RF range remain unverified.
 The hearing-device results above belong to the original Pico 2 W + nRF24L01+ firmware.

@@ -1,7 +1,7 @@
 #include "wire.h"
 #include <string.h>
 const uint8_t mm_address[4] = {0x12, 0x34, 0x56, 0x78};
-const uint8_t mm_hop[16] = {24, 76, 18, 44, 66, 36, 16, 78, 68, 20, 62, 22, 38, 48, 42, 28};
+const uint8_t mm_hop[16] = {24, 76, 18, 68, 66, 36, 16, 44, 78, 20, 62, 22, 38, 48, 42, 28};
 const uint8_t mm_pair_channels[4] = {10, 46, 28, 64};
 void mm_payload(uint8_t out[32], unsigned slot, uint8_t counter, const uint8_t *codec) {
     static const uint8_t type[] = {0x18, 0x19, 0x1A}, low[] = {1, 0, 1};

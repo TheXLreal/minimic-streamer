@@ -170,7 +170,7 @@ class FirmwareTests(unittest.TestCase):
         machine.feed(a + b + bytes(x ^ y for x, y in zip(a, b)))
         machine.run(lambda: machine.read('tx_frames') >= 49)
         self.assertEqual(len(machine.packets), 49 * 5)
-        hop = [24, 76, 18, 44, 66, 36, 16, 78, 68, 20, 62, 22, 38, 48, 42, 28]
+        hop = [24, 76, 18, 68, 66, 36, 16, 44, 78, 20, 62, 22, 38, 48, 42, 28]
         for frame_index in range(49):
             counter = frame_index % 48
             group = machine.packets[5 * frame_index:5 * frame_index + 5]
