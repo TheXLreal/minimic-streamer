@@ -76,7 +76,7 @@
         22,
         0
       ],
-      "listening": "Possibly better or about the same; user unsure"
+      "listening": "Follow-up independent comparison: about the same as #1; no clear quality improvement"
     },
     "local_underflows_drops_late_faults_delta_all_three": [
       0,
@@ -84,6 +84,6 @@
       0,
       0
     ],
-    "limitations": "Short non-simultaneous captures of reception at DK, not Nucleus 7 audio acknowledgements. Antenna #1 repeat not captured; user is independently comparing antennas."
+    "limitations": "Short non-simultaneous captures of reception at DK, not Nucleus 7 audio acknowledgements. Antenna #1 repeat not captured. Independent listening comparison of #1 and #3 found no clear quality improvement."
   }
 }

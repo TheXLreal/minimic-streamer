@@ -333,7 +333,7 @@
   "median_rssi_change_db": 14.5,
   "user_report": "External antenna #1: long dropouts stopped during listening; both muffled/telephone-like and raspy/robotic distortion remain",
   "limitations": "RSSI measures DK reception of processor beacons, not reception at Nucleus 7. Small non-simultaneous samples and approximate placement.",
-  "additional_antennas_status": "All three external antennas captured and listening reported. User is now independently comparing them; awaiting final listening result. Requested antenna #1 repeat has not been captured.",
+  "additional_antennas_status": "All three external antennas captured. User independently compared #1 and #3 and reported approximately the same sound. No repeat DK RF capture of antenna #1 was taken.",
   "external_antenna_2": {
     "antenna_number": 2,
     "playback": "User confirmed music playing through MiniMic Audio / Mini Microphone; audio active in both boundary statuses",
@@ -698,7 +698,7 @@
       "replies": "0",
       "delay_us": "0"
     },
-    "user_report": "Possibly better, or about the same; user is unsure and reports fluctuating impression",
+    "user_report": "Follow-up after independent comparison: antennas #1 and #3 seem about the same; no clear audio quality improvement",
     "rssi_by_channel": {
       "10": {
         "samples": 7,
@@ -735,7 +735,8 @@
       "crc_ok": 22,
       "crc_bad": 0,
       "rx_addr": 22
-    }
+    },
+    "initial_user_report": "Possibly better, or about the same; user is unsure and reports fluctuating impression"
   },
-  "conclusion": "Initial antenna #1 capture has the strongest DK beacon RSSI. Subjective audio quality winner is unclear and distortion remains unresolved. An antenna #1 repeat would be needed to check reproducibility; user is currently doing their own listening comparison."
+  "conclusion": "Initial antenna #1 capture has the strongest DK beacon RSSI, without a repeat capture to check reproducibility. Independent listening comparison found no clear quality improvement between #1 and #3. Distortion remains unresolved."
 }

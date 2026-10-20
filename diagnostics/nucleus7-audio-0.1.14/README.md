@@ -68,14 +68,16 @@ use the same beacon monitor and restore monitoring OFF afterwards.
 |---|---:|---:|---|
 | #1 | -66 dBm | 18 / 0 | Long dropouts stopped; muffled and raspy/robotic quality remains |
 | #2 | -75 dBm | 13 / 1 | Seems about the same as #1 |
-| #3 | -75 dBm | 22 / 0 | Possibly better, or about the same; user unsure |
+| #3 | -75 dBm | 22 / 0 | Follow-up independent comparison: about the same as #1 |
 
 Underflow, queue-drop, late-frame and radio-fault counters did not increase during
 any of these three music captures. These are local transmitter checks, not audio
 delivery acknowledgements from Nucleus 7. The listening reports do not establish
 a clear quality winner. Antenna #1 had the strongest observed beacon reception.
-A repeat after returning to #1 was requested to check reproducibility, but has not
-been captured; the user is currently doing their own listening comparison.
+A repeat after returning to #1 was requested to check reproducibility, but was not
+captured. The user instead independently compared #1 and #3 and reported that
+they seem about the same. This supersedes the initial uncertain impression that
+#3 might sound better. Distortion remains unresolved.
 Long-term stability and RF range remain unverified.
 
 [Header/register/timestamp records](TX_HEADERS.json) retain payload type/counter
