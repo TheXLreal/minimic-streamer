@@ -15,7 +15,8 @@
     "stable_audio_user_report": null,
     "encoded_frames_advanced": true,
     "runtime_version_verified": "0.1.15",
-    "usb_pcm_nonzero": true
+    "usb_pcm_nonzero": true,
+    "clean_audio_user_report": false
   },
   "programming": {
     "utility": "Nordic nRF Util",
@@ -42,7 +43,7 @@
     42,
     28
   ],
-  "listening": "User tentatively reports that audio seems better with 0.1.15; remaining distortion and continuity are awaiting clarification",
+  "listening": "User tentatively reports better sound with 0.1.15; follow-up describes slight robotic quality and muffled sound. Dropout continuity was not explicitly clarified.",
   "limitations": [
     "Local transmitter counters do not establish audio delivery at Nucleus 7",
     "Preliminary listening does not establish sustained quality, long-term stability or range"
@@ -131,7 +132,14 @@
   },
   "listening_user_report": {
     "preliminary": "Seems better (tentative)",
-    "remaining_distortion": null,
-    "continuity": null
+    "remaining_distortion": "Slight robotic quality and muffled sound",
+    "continuity": null,
+    "follow_up": "Slight robotic quality and muffled sound remain"
+  },
+  "pico_reference_comparison": {
+    "hardware_currently_available": false,
+    "status": "Deferred until user receives Pico + nRF24 hardware, expected in about five days",
+    "required_controls": "Use the same corrected HOP table, transmitter address and input audio before comparing radio implementations",
+    "common_encoder_source": "codec/encoder.c"
   }
 }

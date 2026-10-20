@@ -45,9 +45,17 @@ These are local transmitter observations, not receiver audio acknowledgements.
 The status field `paired=0` counts confirmations since the latest board boot;
 it does not query the receiver's saved pairing.
 
-The user tentatively reports that audio seems better with 0.1.15. Remaining
-distortion and continuity are awaiting clarification. This is a preliminary
-listening improvement, not a confirmed solution to the quality problem.
+The user tentatively reports that audio seems better with 0.1.15. Follow-up
+listening describes slight robotic quality and muffled sound remaining. Dropout
+continuity was not explicitly clarified. This is partial improvement, not a
+confirmed solution to the quality problem.
+
+Both the Pico and nRF5340 builds compile the shared `codec/encoder.c`. A Pico +
+nRF24 reference comparison is deferred until the user's hardware is available
+(expected in about five days). It must use the same corrected HOP table, address
+and input audio; the original Pico snapshot's old HOP order would confound that
+comparison. The present evidence does not identify the remaining distortion as
+either a codec problem or an nRF5340 radio problem.
 
 Return the cable to J3 / nRF USB, select MiniMic Audio in Windows and Mini
 Microphone in the Nucleus app, and compare the same audio at the same volume and

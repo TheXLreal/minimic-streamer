@@ -16,7 +16,8 @@ The current build is **0.1.15** (19 ARM emulation checks passed). It uses the re
 is checked in ARM emulation. See the [build and HOP verification](diagnostics/nrf5340dk-0.1.15/README.md).
 Both cores have been programmed and readback verified on the DK. USB music playback
 runs without local starvation or faults in the captured session; the user tentatively
-reports better sound. Residual distortion and sustained stability are not yet confirmed.
+reports better sound, with slight robotic quality and muffled sound still present.
+Sustained stability remains unconfirmed.
 It retains +3 dBm audio, input PCM peaks and RADIO active between the two packets in a slot.
 Hardware traces verify nonzero codec data and a 6144-us frame period;
 [audio timing and listening diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md)

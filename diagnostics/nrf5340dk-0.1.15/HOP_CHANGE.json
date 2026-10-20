@@ -67,5 +67,5 @@
     "minimic_net.hex": "64f12faa613416912d77e3dce6bd328d4a12bdbe00c29ab35bbfcad84a579a67",
     "minimic_nrf5340dk.hex": "947ff89511bd9a1b58ec3c48ed64c6aa1485d2290c8f5fe6721ba972f7af0101"
   },
-  "hardware_listening_result": "Preliminary user report: seems better; remaining distortion and continuity not yet clarified"
+  "hardware_listening_result": "Tentative subjective improvement; follow-up confirms slight robotic quality and muffled sound remain. Continuity not explicitly clarified."
 }
