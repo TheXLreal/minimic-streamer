@@ -5,6 +5,7 @@ param(
     [ValidateRange(0,20000)][Nullable[uint32]]$PairDelayUs = $null,
     [ValidateSet(0,3)][Nullable[uint32]]$TxPowerDbm = $null,
     [ValidateRange(1,16)][Nullable[uint32]]$TraceAudioFrames = $null,
+    [ValidateRange(0,1000)][Nullable[uint32]]$AudioGapUs = $null,
     [switch]$Watch
 )
 $ErrorActionPreference = 'Stop'
@@ -28,6 +29,7 @@ try {
         $serial.WriteLine("PAIRDELAY $PairDelayUs")
     }
     if ($null -ne $TxPowerDbm) { $serial.WriteLine("TXPOWER $TxPowerDbm") }
+    if ($null -ne $AudioGapUs) { $serial.WriteLine("AUDIOGAP $AudioGapUs") }
     if ($null -ne $TraceAudioFrames) { $serial.WriteLine("TRACEAUDIO $TraceAudioFrames") }
     $serial.WriteLine($Command)
     $stopAt = [DateTime]::UtcNow.AddSeconds(3)

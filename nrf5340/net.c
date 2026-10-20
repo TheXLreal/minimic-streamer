@@ -81,7 +81,7 @@ static void rf_init(void) {
     NRF_DPPIC_NS->CHENSET = 7;
     NRF_RADIO->PACKETPTR = (uint32_t)(uintptr_t)dma;
 }
-static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr[4], uint32_t at) {
+static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr[4], uint32_t at, bool keep_tx) {
     if (!rf_off()) return false;
     rf_address(addr); NRF_RADIO->FREQUENCY = channel;
     uint32_t pcf = IPC->pair_state == PAIR_REPLY ? IPC->pair_pcf : 0;
@@ -96,6 +96,9 @@ static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr
         NRF_RADIO->PCNF0 = 0;
         memcpy(dma, payload, 32);
     }
+    NRF_RADIO->PACKETPTR = (uint32_t)(uintptr_t)dma;
+    if (keep_tx) NRF_RADIO->SHORTS &= ~RADIO_SHORTS_END_DISABLE_Msk;
+    else NRF_RADIO->SHORTS |= RADIO_SHORTS_END_DISABLE_Msk;
     NRF_RADIO->EVENTS_DISABLED = 0;
     NRF_RADIO->EVENTS_END = 0;
     __DMB(); wait_until(at);
@@ -103,7 +106,7 @@ static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr
     uint32_t task = micros();
     NRF_RADIO->TASKS_TXEN = 1;
     uint32_t end = micros() + 700;
-    while (!NRF_RADIO->EVENTS_DISABLED) {
+    while (keep_tx ? !NRF_RADIO->EVENTS_END : !NRF_RADIO->EVENTS_DISABLED) {
         if (due(micros(), end)) {
             IPC->faults++; rf_off();
             if (IPC->pair_state == PAIR_REPLY) trace_packet(RF_TX_TIMEOUT, task, pair_reference_us);
@@ -113,6 +116,33 @@ static bool rf_tx(const uint8_t payload[32], uint8_t channel, const uint8_t addr
     }
     if (IPC->pair_state == PAIR_REPLY) trace_packet(RF_TX_OK, task, pair_reference_us);
     else if (audio_trace_active) trace_packet(RF_AUDIO_TX, task, audio_reference_us);
+    return true;
+}
+static bool rf_next(const uint8_t payload[32], uint32_t gap) {
+    /* nRF24's preloaded TX FIFO keeps the transmitter active between packets
+     * in one CE-high slot. Keep native RADIO in TxIdle after the first END,
+     * replace the completed DMA payload, and START without another TXEN ramp. */
+    uint32_t at = NRF_TIMER0->CC[3] + gap;
+    memcpy(dma, payload, 32);
+    NRF_RADIO->SHORTS |= RADIO_SHORTS_END_DISABLE_Msk;
+    NRF_RADIO->EVENTS_END = 0; NRF_RADIO->EVENTS_DISABLED = 0;
+    __DMB(); wait_until(at);
+    if (!permitted()) { rf_off(); return false; }
+    uint32_t task = micros();
+    /* No second READY event occurs when restarting from TxIdle. CC[1] here
+     * is explicitly a software capture immediately before TASKS_START.
+     * RF_AUDIO_RESTART distinguishes this from the hardware READY captures. */
+    NRF_TIMER0->TASKS_CAPTURE[1] = 1;
+    NRF_RADIO->TASKS_START = 1;
+    uint32_t end = micros() + 700;
+    while (!NRF_RADIO->EVENTS_DISABLED) {
+        if (due(micros(), end)) {
+            IPC->faults++; rf_off();
+            if (audio_trace_active) trace_packet(RF_AUDIO_RESTART_TIMEOUT, task, audio_reference_us);
+            return false;
+        }
+    }
+    if (audio_trace_active) trace_packet(RF_AUDIO_RESTART, task, audio_reference_us);
     return true;
 }
 static void rx_start(uint8_t channel) {
@@ -238,7 +268,7 @@ static void pairing(void) {
                 pair_reference_us = heard;
                 uint8_t target[4];
                 mm_pair_target(target, b + 8, IPC->pair_address_order, IPC->pair_replies);
-                if (rf_tx(r, ch, target, heard + delay)) IPC->pair_replies++;
+                if (rf_tx(r, ch, target, heard + delay, false)) IPC->pair_replies++;
                 rx_start(ch); IPC->pair_state = PAIR_SEARCH;
             }
         }
@@ -290,11 +320,13 @@ int main(void) {
         bool sent = true;
         for (unsigned s = 0; s < 3 && permitted(); s++) {
             uint8_t ch = mm_hop[(3 * counter + s) % 16];
-            sent &= rf_tx(p[s], ch, mm_address, epoch + s * MM_SLOT_US);
+            bool burst = s < 2 && IPC->audio_gap_us <= 300;
+            sent &= rf_tx(p[s], ch, mm_address, epoch + s * MM_SLOT_US, burst);
             if (s < 2) {
                 /* Original ordering: A, copy-of-B; B, copy-of-A; parity. */
                 memcpy(copy, p[1 - s], 32); copy[0] |= 0x20;
-                sent &= rf_tx(copy, ch, mm_address, micros());
+                if (burst && sent) sent &= rf_next(copy, IPC->audio_gap_us);
+                else sent &= rf_tx(copy, ch, mm_address, micros(), false);
             }
         }
         if (sent && permitted()) IPC->tx_frames++;

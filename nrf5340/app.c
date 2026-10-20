@@ -41,7 +41,7 @@ static void trace_task(void) {
             "BASE0=0x%08lX BASE1=0x%08lX PREFIX0=0x%08lX PREFIX1=0x%08lX TXADDRESS=0x%08lX "
             "PCNF0=0x%08lX PCNF1=0x%08lX CRCCNF=0x%08lX CRCINIT=0x%08lX CRCPOLY=0x%08lX "
             "MODE=0x%08lX FREQUENCY=0x%08lX TXPOWER=0x%08lX RXADDRESSES=0x%08lX SHORTS=0x%08lX "
-            "VREQH=0x%08lX VREQHREADY=0x%08lX target_start_us=%lu sweep_step=%lu "
+            "VREQH=0x%08lX VREQHREADY=0x%08lX target_start_us=%lu sweep_step=%lu start_source=%s "
             "crc_status=%lu rssi=-%lu header=%04lX data=%s\r\n",
             (unsigned long)t.kind, (unsigned long)t.channel, (unsigned long)t.task_us,
             (unsigned long)t.ready_us, (unsigned long)t.address_us, (unsigned long)t.end_us,
@@ -52,6 +52,7 @@ static void trace_task(void) {
             (unsigned long)t.channel, (unsigned long)t.txpower, (unsigned long)t.rxaddresses,
             (unsigned long)t.shorts, (unsigned long)t.vreqh, (unsigned long)t.vreqhready,
             (unsigned long)t.target_start_us, (unsigned long)t.sweep_step,
+            t.kind >= RF_AUDIO_RESTART ? "START_TASK" : "READY_DPPI",
             (unsigned long)t.crc, (unsigned long)t.rssi,
             (unsigned long)t.header, hex)) return;
         __DMB(); IPC->trace_tail = (tail + 1) % RF_TRACE_RING;
@@ -96,14 +97,14 @@ static void status(void) {
     uint32_t ps = IPC->pair_state;
     log_line("[modem] fw=" MINIMIC_FW_VERSION " board=nrf5340dk radio=builtin usb=%lu enabled=%lu tx_active=%lu mute=%u "
         "mode=%s net=%s tx=%lu under=%lu drop=%lu late=%lu faults=%lu depth=%lu fifo=%lu "
-        "tx_dbm=%lu pcm_peak=%lu encoded=%lu pair=%s paired=%lu beacons=%lu addr=12345678 rx=%02X%02X%02X%02X "
+        "tx_dbm=%lu gap_us=%lu pcm_peak=%lu encoded=%lu pair=%s paired=%lu beacons=%lu addr=12345678 rx=%02X%02X%02X%02X "
         "rx_addr=%lu crc_ok=%lu crc_bad=%lu rx_other=%lu replies=%lu delay_us=%lu\r\n",
         (unsigned long)IPC->usb_ready, (unsigned long)IPC->enabled, (unsigned long)IPC->active,
         user_mute, app_raw_active() ? "raw" : audio_streaming() ? "audio" : "idle",
         net_fault ? "fault" : IPC->ready == IPC_MAGIC ? "ready" : "starting",
         (unsigned long)IPC->tx_frames, (unsigned long)IPC->underflows, (unsigned long)drops,
         (unsigned long)IPC->late_frames, (unsigned long)IPC->faults, (unsigned long)queue_depth(),
-        (unsigned long)audio_fifo(), (unsigned long)IPC->tx_dbm,
+        (unsigned long)audio_fifo(), (unsigned long)IPC->tx_dbm, (unsigned long)IPC->audio_gap_us,
         (unsigned long)audio_pcm_peak(), (unsigned long)audio_encoded_frames(),
         ps < sizeof states / sizeof states[0] ? states[ps] : "invalid",
         (unsigned long)IPC->pair_count, (unsigned long)IPC->beacons,
@@ -137,6 +138,12 @@ static void command(const char *line) {
             log_line("[error] TXPOWER 0 or 3 dBm\r\n");
         else { IPC->tx_dbm = value; log_line("[control] tx_dbm=%lu\r\n", value); }
     }
+    else if (!strncmp(line, "AUDIOGAP ", 9)) {
+        char *end; unsigned long value = strtoul(line + 9, &end, 10);
+        if (end == line + 9 || *end || (value > 300 && value != 1000))
+            log_line("[error] AUDIOGAP 0..300 us, or 1000 for separate TXEN\r\n");
+        else { IPC->audio_gap_us = value; log_line("[control] audio_gap_us=%lu\r\n", value); }
+    }
     else if (!strncmp(line, "TRACEAUDIO ", 11)) {
         char *end; unsigned long value = strtoul(line + 11, &end, 10);
         if (end == line + 11 || *end || value < 1 || value > 16 || pairing_active())
@@ -145,7 +152,7 @@ static void command(const char *line) {
     }
     else if (!strcmp(line, "REBOOT")) { IPC->enabled = 0; __DMB(); delay_us(8000); NVIC_SystemReset(); }
     else if (!strcmp(line, "HELP"))
-        log_line("[help] STATUS | ON | OFF | MUTE | UNMUTE | PAIR | CANCEL | PAIRDELAY <0|1000..20000> | TXPOWER <0|3> | TRACEAUDIO <1..16> | MONITOR ON | MONITOR OFF | REBOOT\r\n");
+        log_line("[help] STATUS | ON | OFF | MUTE | UNMUTE | PAIR | CANCEL | PAIRDELAY <0|1000..20000> | TXPOWER <0|3> | AUDIOGAP <0..300|1000> | TRACEAUDIO <1..16> | MONITOR ON | MONITOR OFF | REBOOT\r\n");
     else log_line("[error] unknown command; send HELP\r\n");
 }
 static void serial_task(void) {

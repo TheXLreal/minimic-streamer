@@ -1,0 +1,11 @@
+{
+  "ran_utc": "2026-10-20T13:16:07.334173+00:00",
+  "success": true,
+  "tests": 19,
+  "limitations": "TIMER/RADIO are simulated. No hardware, USB host or receiver validation.",
+  "images": {
+    "minimic_app.hex": "e27cf1a011fdcb7c6f5a09624884856525700e35aeb6456b1cc16cebc188bc9b",
+    "minimic_net.hex": "30dbbc61fe088e3908513a9b8246fa4adcd77e0d9b74911830d89df0d263ccdf",
+    "minimic_nrf5340dk.hex": "337b7fba6b6b680740ee82efd849fe2fae34bebd57ec18bc702e216180683e5f"
+  }
+}

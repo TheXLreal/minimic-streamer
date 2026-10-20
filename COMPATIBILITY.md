@@ -39,10 +39,12 @@ this project is not affiliated with either company.
 The nRF5340 DK port uses its built-in radio and has been compiled and checked in ARM emulation.
 Flash/readback, CDC and a Windows render endpoint have been verified on a DK.
 USB digital-silence playback and software ON/OFF/MUTE controls also pass on hardware.
-**nRF5340 DK v0.1.12 + Nucleus 7: pairing confirmed, audible playback unresolved.**
+**nRF5340 DK + Nucleus 7: pairing and audible computer audio confirmed; quality/stability unresolved.**
 The +3-dBm timing-sweep attempt received eight addressed `0x16` confirmations;
-see the [capture](diagnostics/nucleus7-0.1.12/README.md). The user hears the streaming
-activation signal but no computer audio. Hardware buttons, long-term stability
+see the [capture](diagnostics/nucleus7-0.1.12/README.md). With 0.1.14, selecting Mini
+Microphone in the Nucleus app enables audible audio, but the user reports poor
+quality and long dropouts. See [audio diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md).
+Hardware buttons, long-term stability
 and RF range remain unverified.
 The hearing-device results above belong to the original Pico 2 W + nRF24L01+ firmware.
 See [NRF5340DK_RU.md](NRF5340DK_RU.md).

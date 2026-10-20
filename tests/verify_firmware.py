@@ -50,7 +50,7 @@ class NetMachine:
     MAILBOX = 0x20070000
 
     def __init__(self, enabled=1, usb=1, muted=0, epoch=0, pair_request=0, pair_desired=0,
-                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0, pair_start_sweep=0, pair_tx_dbm=0, high_voltage_ready=1, tx_dbm=0, trace_audio_frames=0):
+                 pair_delay_us=0, debug_radio=0, trace_enabled=0, pair_address_order=0, pair_pcf=0, pair_start_sweep=0, pair_tx_dbm=0, high_voltage_ready=1, tx_dbm=0, trace_audio_frames=0, audio_gap_us=0):
         self.uc = Uc(UC_ARCH_ARM, UC_MODE_THUMB | UC_MODE_MCLASS)
         self.uc.ctl_set_cpu_model(UC_CPU_ARM_CORTEX_M33)
         for base, size in ((0x01000000, 0x40000), (0x21000000, 0x10000),
@@ -68,21 +68,23 @@ class NetMachine:
         self.tx_references = []
         self.tx_headers = []
         self.tx_power = []
+        self.tx_starts, self.tx_ends = [], []
         self.stop_condition = lambda: False
         self.rx_action = None
-        self.write('magic', 0x4D4D5309)
+        self.write('magic', 0x4D4D530A)
         self.put(0x41004508, high_voltage_ready)
         for name, value in dict(enabled=enabled, usb_ready=usb, muted=muted, epoch=epoch,
                                 pair_request=pair_request, pair_desired=pair_desired, pair_delay_us=pair_delay_us,
                                 debug_radio=debug_radio, trace_enabled=trace_enabled,
                                 pair_address_order=pair_address_order, pair_pcf=pair_pcf,
                                 pair_start_sweep=pair_start_sweep, pair_tx_dbm=pair_tx_dbm,
-                                tx_dbm=tx_dbm, trace_audio_frames=trace_audio_frames).items():
+                                tx_dbm=tx_dbm, trace_audio_frames=trace_audio_frames, audio_gap_us=audio_gap_us).items():
             self.write(name, value)
         at = self.syms['platform_init'][0] & ~1
         self.uc.hook_add(UC_HOOK_CODE, self.code, begin=at, end=at)
         self.uc.hook_add(UC_HOOK_MEM_WRITE, self.mmio, begin=self.RADIO, end=self.RADIO + 0xFFF)
         self.uc.hook_add(UC_HOOK_MEM_WRITE, self.timer, begin=0x4100C040, end=0x4100C043)
+        self.uc.hook_add(UC_HOOK_MEM_WRITE, self.capture_start, begin=0x4100C044, end=0x4100C047)
 
     def word(self, address):
         return struct.unpack('<I', self.uc.mem_read(address, 4))[0]
@@ -111,6 +113,9 @@ class NetMachine:
         if self.stop_condition():
             uc.emu_stop()
 
+    def capture_start(self, uc, access, address, size, value, data):
+        if value: self.put(0x4100C544, self.now)
+
     def inject_rx(self, payload):
         ptr = self.word(self.RADIO + 0x504)
         self.uc.mem_write(ptr, payload)
@@ -125,7 +130,7 @@ class NetMachine:
 
     def mmio(self, uc, access, address, size, value, data):
         offset = address - self.RADIO
-        if offset == 0 and value:  # TXEN
+        if offset in (0, 8) and value:  # TXEN or START from TxIdle
             ptr = self.word(self.RADIO + 0x504)
             header_len = 2 if self.word(self.RADIO + 0x514) else 0
             self.tx_headers.append(bytes(uc.mem_read(ptr, header_len)))
@@ -133,12 +138,17 @@ class NetMachine:
             self.tx_addresses.append((self.word(self.RADIO + 0x51C), self.word(self.RADIO + 0x524)))
             self.tx_references.append(self.word(self.syms['pair_reference_us'][0]))
             self.tx_power.append((self.word(self.RADIO + 0x50C), self.word(0x41004500), self.word(0x41004508)))
-            self.put(0x4100C544, self.now + 130)
-            self.put(0x4100C548, self.now + 150)
-            self.put(0x4100C54C, self.now + 286)
-            self.now += 286
+            ramp = 130 if offset == 0 else 0
+            if offset == 0: self.put(0x4100C544, self.now + ramp)
+            self.tx_starts.append(self.now + ramp)
+            self.tx_ends.append(self.now + ramp + 156)
+            self.put(0x4100C548, self.now + ramp + 20)
+            self.put(0x4100C54C, self.now + ramp + 156)
+            self.now += ramp + 156
             self.put(self.RADIO + 0x10C, 1)
-            self.put(self.RADIO + 0x110, 1)
+            disable = bool(self.word(self.RADIO + 0x200) & 2)
+            self.put(self.RADIO + 0x550, 0 if disable else 10)
+            self.put(self.RADIO + 0x110, int(disable))
         elif offset == 4 and value and self.rx_action:  # RXEN
             self.rx_action(self)
         elif offset == 0x10 and value:  # DISABLE
@@ -442,7 +452,7 @@ class FirmwareTests(unittest.TestCase):
         self.assertEqual(machine.read('trace_head'), 10)
         base = machine.MAILBOX + machine.fields['trace']
         records = [struct.unpack('<28I32s', machine.uc.mem_read(base + index * 144, 144)) for index in range(10)]
-        self.assertTrue(all(record[0] == 5 for record in records))
+        self.assertEqual([record[0] for record in records], [5, 7, 5, 7, 5] * 2)
         self.assertEqual([record[-1][0] for record in records], [0x18, 0x39, 0x19, 0x38, 0x1A] * 2)
         self.assertEqual([record[24:28] for record in records], [(1, 1, 0, 0xFFFFFFFF)] * 10)
         from capture_rf_swd import KEYS, text_record
@@ -459,6 +469,27 @@ class FirmwareTests(unittest.TestCase):
         machine.write('enabled', 0)
         machine.run(lambda: machine.read('active') == 0)
         self.assertEqual(machine.word(0x41004500), 0)
+
+    def test_slot_burst_keeps_transmitter_active(self):
+        for gap in (0, 50, 100, 1000):
+            machine = NetMachine(trace_enabled=1, trace_audio_frames=2, audio_gap_us=gap)
+            machine.run(lambda: machine.read('tx_frames') == 2)
+            base = machine.MAILBOX + machine.fields['trace']
+            records = [struct.unpack('<28I32s', machine.uc.mem_read(base + index * 144, 144))
+                       for index in range(10)]
+            for index in (1, 3, 6, 8):
+                actual_gap = machine.tx_starts[index] - machine.tx_ends[index - 1]
+                if gap == 1000:
+                    self.assertEqual(records[index][0], 5)
+                    self.assertGreaterEqual(actual_gap, 130)
+                else:
+                    self.assertEqual(records[index][0], 7)
+                    self.assertGreaterEqual(actual_gap, gap)
+                    self.assertLessEqual(actual_gap, max(gap + 16, 64))
+                    self.assertEqual(records[index][3], records[index][2])
+                    self.assertEqual(records[index][4] - records[index][3], 20)
+            self.assertEqual(machine.read('faults'), 0)
+            self.assertEqual(machine.read('late_frames'), 0)
 
     def test_full_trace_buffer_never_stalls_radio(self):
         machine = NetMachine(trace_enabled=1, pair_request=1, pair_desired=1)

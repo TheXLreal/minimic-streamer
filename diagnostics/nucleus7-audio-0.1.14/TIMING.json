@@ -1,0 +1,38 @@
+{
+  "firmware": "0.1.14",
+  "packets": 20,
+  "complete_frames": 4,
+  "packet_types": [
+    "18",
+    "39",
+    "19",
+    "38",
+    "1A"
+  ],
+  "copies_and_parity_correct": true,
+  "requested_power_dbm": 3,
+  "vreqh_and_ready_verified": true,
+  "frame_periods_us": [
+    6144,
+    6144,
+    6144
+  ],
+  "duplicate_packet_gap_us_from_hardware_address_minus_20": [
+    18,
+    18,
+    18,
+    18,
+    19,
+    19,
+    18,
+    17
+  ],
+  "restart_start_timestamp_source": "Software TIMER capture before START; ADDRESS and END remain hardware DPPI captures",
+  "gap_derivation": "At 2 Mbps, 1-byte preamble + 4-byte address = 20 us; subtract 20 from hardware ADDRESS timestamp",
+  "codec_nonzero": true,
+  "pcm_peaks_observed": [
+    5942,
+    5361,
+    2263
+  ]
+}

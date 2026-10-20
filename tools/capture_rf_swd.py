@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / 'build/test-deps'))
 from elftools.elf.elffile import ELFFile
 from package_firmware import read_hex
 
-MAGIC = 0x4D4D5309
+MAGIC = 0x4D4D530A
 MAILBOX = 0x20070000
 RECORD = struct.Struct('<28I32s')
 KEYS = ('kind', 'channel', 'task_us', 'ready_us', 'address_us', 'end_us',
@@ -118,7 +118,7 @@ def text_record(record, sequence):
     if transmit:
         spi, air = tx_address(record)
         packet = (f"TX seq={sequence} channel={record['channel']} addr_spi={spi} addr_air={air} "
-                  f"payload={record['payload']} result={'END' if record['kind'] in (3, 5) else 'TIMEOUT'}")
+                  f"payload={record['payload']} result={'END' if record['kind'] in (3, 5, 7) else 'TIMEOUT'}")
         reference_label = 'frame_epoch' if record['kind'] >= 5 else 'beacon_rx_end'
         delta_label = 'frame_epoch_to_tx_start' if record['kind'] >= 5 else 'beacon_end_to_tx_start'
         if 'vreqh' in record:
@@ -126,8 +126,10 @@ def text_record(record, sequence):
             dbm = dbm - 256 if dbm >= 128 else dbm
             dbm += 3 if record['vreqh'] & record['vreqhready'] & 1 else 0
             packet += f" configured_tx_dbm={dbm} target_start_us={record['target_start_us']} sweep_step={record['sweep_step']}"
+        start_label = 'tx_start_task_capture' if record['kind'] >= 7 else 'tx_start_ready'
+        task_label = 'start_task' if record['kind'] >= 7 else 'txen'
         timing = (f"TIME TX seq={sequence} {reference_label}_us={record['reference_us']} "
-                  f"txen_us={record['task_us']} tx_start_ready_us={record['ready_us']} "
+                  f"{task_label}_us={record['task_us']} {start_label}_us={record['ready_us']} "
                   f"tx_address_us={record['address_us']} tx_end_us={record['end_us']} "
                   f"{delta_label}_us={diff(record['ready_us'], record['reference_us'])}")
         if record.get('target_start_us'):

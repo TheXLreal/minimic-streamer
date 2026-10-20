@@ -1,0 +1,45 @@
+{
+  "ran_utc": "2026-10-20T13:25:38.810295+00:00",
+  "firmware": "0.1.14",
+  "board": "PCA10095",
+  "images": {
+    "minimic_app.hex": "e27cf1a011fdcb7c6f5a09624884856525700e35aeb6456b1cc16cebc188bc9b",
+    "minimic_net.hex": "30dbbc61fe088e3908513a9b8246fa4adcd77e0d9b74911830d89df0d263ccdf",
+    "minimic_nrf5340dk.hex": "337b7fba6b6b680740ee82efd849fe2fae34bebd57ec18bc702e216180683e5f"
+  },
+  "checks": {
+    "both_core_program_and_readback_verified": true,
+    "usb_render_and_cdc_present": true,
+    "real_music_pcm_nonzero": true,
+    "codec_frames_nonzero": true,
+    "radio_audio_trace_packets": 20,
+    "frame_period_us": 6144,
+    "copies_and_parity_valid": true,
+    "configured_tx_dbm": 3,
+    "vreqh_and_ready_verified": true,
+    "drops": 0,
+    "late_frames": 0,
+    "radio_faults": 0,
+    "audible_computer_audio_user_report": true,
+    "stable_audio_user_report": false
+  },
+  "pairing": {
+    "confirmed_with_firmware": "0.1.12",
+    "addressed_0x16_packets": 8,
+    "receiver_count": 1
+  },
+  "source_selection": "User selected Mini Microphone in Nucleus app; initial activation signal alone was insufficient",
+  "listening": "Audio audible after Nucleus app Mini Microphone selection, but poor quality and long dropouts persist",
+  "limitations": [
+    "RADIO timestamps are internal events, not external RF measurements",
+    "Second burst packet START timestamp is a software TIMER capture; ADDRESS/END are hardware DPPI",
+    "Button behavior, range and long-term stability are not fully validated"
+  ],
+  "interval_comparison": {
+    "AUDIOGAP_0": "Audible, intermittent/distorted",
+    "AUDIOGAP_130": "Audio disappeared",
+    "AUDIOGAP_1000": "Audio disappeared",
+    "current_runtime_gap": 0,
+    "external_antenna_change": false
+  }
+}

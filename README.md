@@ -7,9 +7,15 @@ render endpoint, digital-silence USB playback and software ON/OFF/MUTE controls 
 been verified on a DK. **Version 0.1.12 paired with the tested Nucleus 7:**
 the [successful trace](diagnostics/nucleus7-0.1.12/README.md) contains eight addressed
 `0x16` confirmations after four replies. It used +3 dBm and a READY/START delay sweep;
-the last reply started at 6001 us after beacon END. **Computer audio is not yet heard
-through the processor**, although USB audio reaches the DK without drops or faults.
-The public logs replace the receiver serial. The [previous unsuccessful trace](diagnostics/nucleus7-0.1.11/README.md)
+the last reply started at 6001 us after beacon END. With 0.1.14, the user **hears
+computer audio after selecting Mini Microphone in the Nucleus app**, but reports
+poor quality and long dropouts. USB audio reaches the DK without drops or faults.
+The current build is 0.1.14 (19 ARM emulation checks). It applies +3 dBm to audio,
+reports input PCM peaks, and keeps RADIO active between the two packets in a slot.
+Hardware traces verify nonzero codec data and a 6144-us frame period;
+[audio timing and listening diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md)
+record the unresolved quality/stability problem. The public logs replace the receiver serial.
+The [previous unsuccessful trace](diagnostics/nucleus7-0.1.11/README.md)
 remains available. RF range is unverified. `TESTS.json` records ARM emulation checks;
 USB/audio checks from earlier builds do not validate RF interoperability.
 The Pico instructions below describe the original implementation.

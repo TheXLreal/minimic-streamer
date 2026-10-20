@@ -1,0 +1,35 @@
+{
+  "runtime_gap_us": 1000,
+  "status_samples": 72,
+  "music_samples": 54,
+  "user_result": "Audio disappeared completely; restored AUDIOGAP 0",
+  "usb_drops": [
+    0
+  ],
+  "radio_late": [
+    0
+  ],
+  "radio_faults": [
+    0
+  ],
+  "active_underflow_values": [
+    28664,
+    28679,
+    28735,
+    28818,
+    28842,
+    28900,
+    28984,
+    29005,
+    29066,
+    29148,
+    29167,
+    29231,
+    29313,
+    29330,
+    29395
+  ],
+  "pcm_peak_min": 0,
+  "pcm_peak_max": 8579,
+  "note": "Underflows were stable while codec frames advanced. They increased after incoming PCM ceased, before the USB alternate setting changed to idle."
+}
