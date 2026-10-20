@@ -1,0 +1,741 @@
+{
+  "firmware": "0.1.14",
+  "configured_tx_dbm": 3,
+  "audio_gap_us": 0,
+  "phone_bluetooth_disabled_user_report": "Dropouts persisted",
+  "before_external_antenna": {
+    "rx_packets": [
+      {
+        "channel": 28,
+        "rssi_dbm": -74,
+        "received_end_us": 1181134978
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -80,
+        "received_end_us": 1183396534
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -92,
+        "received_end_us": 1184361339
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -81,
+        "received_end_us": 1185772732
+      }
+    ],
+    "rssi_min_dbm": -92,
+    "rssi_max_dbm": -74,
+    "rssi_median_dbm": -80.5,
+    "status_first": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "idle",
+      "net": "ready",
+      "tx": "191348",
+      "under": "86960",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "0",
+      "fifo": "0",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "0",
+      "encoded": "104389",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "0",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "0",
+      "crc_ok": "0",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "status_last": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "idle",
+      "net": "ready",
+      "tx": "192325",
+      "under": "87937",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "0",
+      "fifo": "0",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "0",
+      "encoded": "104389",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "4",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "6",
+      "crc_ok": "4",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "playback": "USB audio idle during capture",
+    "rssi_by_channel": {
+      "28": {
+        "samples": 1,
+        "median_dbm": -74,
+        "min_dbm": -74,
+        "max_dbm": -74
+      },
+      "46": {
+        "samples": 2,
+        "median_dbm": -80.5,
+        "min_dbm": -81,
+        "max_dbm": -80
+      },
+      "64": {
+        "samples": 1,
+        "median_dbm": -92,
+        "min_dbm": -92,
+        "max_dbm": -92
+      }
+    },
+    "counter_deltas": {
+      "tx": 977,
+      "under": 977,
+      "drop": 0,
+      "late": 0,
+      "faults": 0,
+      "encoded": 0,
+      "crc_ok": 4,
+      "crc_bad": 0,
+      "rx_addr": 6
+    }
+  },
+  "after_external_antenna": {
+    "rx_packets": [
+      {
+        "channel": 10,
+        "rssi_dbm": -66,
+        "received_end_us": 129100299
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -67,
+        "received_end_us": 129395211
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -65,
+        "received_end_us": 130059165
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -67,
+        "received_end_us": 130353673
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -66,
+        "received_end_us": 130869971
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -66,
+        "received_end_us": 130943565
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -68,
+        "received_end_us": 131754841
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -70,
+        "received_end_us": 133008218
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -67,
+        "received_end_us": 133450318
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -68,
+        "received_end_us": 134114071
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -65,
+        "received_end_us": 134408916
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -65,
+        "received_end_us": 134629964
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -65,
+        "received_end_us": 135072468
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -66,
+        "received_end_us": 135514567
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -65,
+        "received_end_us": 135588296
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -66,
+        "received_end_us": 135662225
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -65,
+        "received_end_us": 135809948
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -65,
+        "received_end_us": 135889419
+      }
+    ],
+    "rssi_min_dbm": -70,
+    "rssi_max_dbm": -65,
+    "rssi_median_dbm": -66.0,
+    "status_first": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "20675",
+      "under": "3767",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "1988",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "5914",
+      "encoded": "16913",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "0",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "0",
+      "crc_ok": "0",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "status_last": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "21950",
+      "under": "3767",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "2072",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "2024",
+      "encoded": "18187",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "18",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "18",
+      "crc_ok": "18",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "antenna_number": 1,
+    "playback": "Music playing through MiniMic Audio; Mini Microphone selected in Nucleus app",
+    "rssi_by_channel": {
+      "10": {
+        "samples": 4,
+        "median_dbm": -67.5,
+        "min_dbm": -68,
+        "max_dbm": -66
+      },
+      "28": {
+        "samples": 5,
+        "median_dbm": -66,
+        "min_dbm": -70,
+        "max_dbm": -65
+      },
+      "46": {
+        "samples": 3,
+        "median_dbm": -65,
+        "min_dbm": -65,
+        "max_dbm": -65
+      },
+      "64": {
+        "samples": 6,
+        "median_dbm": -66.0,
+        "min_dbm": -67,
+        "max_dbm": -65
+      }
+    },
+    "counter_deltas": {
+      "tx": 1275,
+      "under": 0,
+      "drop": 0,
+      "late": 0,
+      "faults": 0,
+      "encoded": 1274,
+      "crc_ok": 18,
+      "crc_bad": 0,
+      "rx_addr": 18
+    }
+  },
+  "median_rssi_change_db": 14.5,
+  "user_report": "External antenna #1: long dropouts stopped during listening; both muffled/telephone-like and raspy/robotic distortion remain",
+  "limitations": "RSSI measures DK reception of processor beacons, not reception at Nucleus 7. Small non-simultaneous samples and approximate placement.",
+  "additional_antennas_status": "All three external antennas captured and listening reported. User is now independently comparing them; awaiting final listening result. Requested antenna #1 repeat has not been captured.",
+  "external_antenna_2": {
+    "antenna_number": 2,
+    "playback": "User confirmed music playing through MiniMic Audio / Mini Microphone; audio active in both boundary statuses",
+    "requested_monitor_duration_seconds": 8,
+    "rx_packets": [
+      {
+        "channel": 64,
+        "rssi_dbm": -74,
+        "received_end_us": 29935492
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -74,
+        "received_end_us": 30008952
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -80,
+        "received_end_us": 30893821
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -80,
+        "received_end_us": 31115006
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -75,
+        "received_end_us": 31483578
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -75,
+        "received_end_us": 31704831
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -81,
+        "received_end_us": 32073401
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -74,
+        "received_end_us": 32478974
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -74,
+        "received_end_us": 32773886
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -81,
+        "received_end_us": 33295924
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -75,
+        "received_end_us": 33953198
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -74,
+        "received_end_us": 35317234
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -81,
+        "received_end_us": 35685806
+      }
+    ],
+    "rssi_min_dbm": -81,
+    "rssi_max_dbm": -74,
+    "rssi_median_dbm": -75,
+    "status_first": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "4567",
+      "under": "638",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "2032",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "992",
+      "encoded": "3934",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "0",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "0",
+      "crc_ok": "0",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "status_last": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "5891",
+      "under": "638",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "1932",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "11422",
+      "encoded": "5257",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "13",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "14",
+      "crc_ok": "13",
+      "crc_bad": "1",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "user_report": "Seems about the same as antenna #1",
+    "rssi_by_channel": {
+      "10": {
+        "samples": 4,
+        "median_dbm": -80.5,
+        "min_dbm": -81,
+        "max_dbm": -80
+      },
+      "28": {
+        "samples": 1,
+        "median_dbm": -81,
+        "min_dbm": -81,
+        "max_dbm": -81
+      },
+      "46": {
+        "samples": 3,
+        "median_dbm": -75,
+        "min_dbm": -75,
+        "max_dbm": -75
+      },
+      "64": {
+        "samples": 5,
+        "median_dbm": -74,
+        "min_dbm": -74,
+        "max_dbm": -74
+      }
+    },
+    "counter_deltas": {
+      "tx": 1324,
+      "under": 0,
+      "drop": 0,
+      "late": 0,
+      "faults": 0,
+      "encoded": 1323,
+      "crc_ok": 13,
+      "crc_bad": 1,
+      "rx_addr": 14
+    }
+  },
+  "external_antenna_3": {
+    "antenna_number": 3,
+    "playback": "User confirmed music playing through MiniMic Audio / Mini Microphone; audio active throughout statuses",
+    "requested_monitor_duration_seconds": 8,
+    "rx_packets": [
+      {
+        "channel": 28,
+        "rssi_dbm": -74,
+        "received_end_us": 42001447
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 42812387
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -77,
+        "received_end_us": 42886451
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -76,
+        "received_end_us": 43255157
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -76,
+        "received_end_us": 43402614
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -74,
+        "received_end_us": 44108772
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -75,
+        "received_end_us": 44324146
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 44993912
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 45061093
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 45208950
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 45288687
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -75,
+        "received_end_us": 45798371
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -75,
+        "received_end_us": 45878377
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -74,
+        "received_end_us": 46763248
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -75,
+        "received_end_us": 47125744
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -76,
+        "received_end_us": 47273199
+      },
+      {
+        "channel": 64,
+        "rssi_dbm": -75,
+        "received_end_us": 47420320
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -80,
+        "received_end_us": 47942763
+      },
+      {
+        "channel": 10,
+        "rssi_dbm": -80,
+        "received_end_us": 48237474
+      },
+      {
+        "channel": 46,
+        "rssi_dbm": -79,
+        "received_end_us": 48895082
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -75,
+        "received_end_us": 49042471
+      },
+      {
+        "channel": 28,
+        "rssi_dbm": -75,
+        "received_end_us": 49189794
+      }
+    ],
+    "rssi_min_dbm": -80,
+    "rssi_max_dbm": -74,
+    "rssi_median_dbm": -75.0,
+    "status_first": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "6609",
+      "under": "548",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "2004",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "967",
+      "encoded": "6066",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "0",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "0",
+      "crc_ok": "0",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "status_last": {
+      "fw": "0.1.14",
+      "board": "nrf5340dk",
+      "radio": "builtin",
+      "usb": "1",
+      "enabled": "1",
+      "tx_active": "1",
+      "mute": "0",
+      "mode": "audio",
+      "net": "ready",
+      "tx": "7938",
+      "under": "548",
+      "drop": "0",
+      "late": "0",
+      "faults": "0",
+      "depth": "4",
+      "fifo": "1516",
+      "tx_dbm": "3",
+      "gap_us": "0",
+      "pcm_peak": "1737",
+      "encoded": "7395",
+      "pair": "idle",
+      "paired": "0",
+      "beacons": "22",
+      "addr": "12345678",
+      "rx": "00000000",
+      "rx_addr": "22",
+      "crc_ok": "22",
+      "crc_bad": "0",
+      "rx_other": "0",
+      "replies": "0",
+      "delay_us": "0"
+    },
+    "user_report": "Possibly better, or about the same; user is unsure and reports fluctuating impression",
+    "rssi_by_channel": {
+      "10": {
+        "samples": 7,
+        "median_dbm": -76,
+        "min_dbm": -80,
+        "max_dbm": -75
+      },
+      "28": {
+        "samples": 7,
+        "median_dbm": -75,
+        "min_dbm": -75,
+        "max_dbm": -74
+      },
+      "46": {
+        "samples": 1,
+        "median_dbm": -79,
+        "min_dbm": -79,
+        "max_dbm": -79
+      },
+      "64": {
+        "samples": 7,
+        "median_dbm": -75,
+        "min_dbm": -76,
+        "max_dbm": -75
+      }
+    },
+    "counter_deltas": {
+      "tx": 1329,
+      "under": 0,
+      "drop": 0,
+      "late": 0,
+      "faults": 0,
+      "encoded": 1329,
+      "crc_ok": 22,
+      "crc_bad": 0,
+      "rx_addr": 22
+    }
+  },
+  "conclusion": "Initial antenna #1 capture has the strongest DK beacon RSSI. Subjective audio quality winner is unclear and distortion remains unresolved. An antenna #1 repeat would be needed to check reproducibility; user is currently doing their own listening comparison."
+}

@@ -42,8 +42,9 @@ USB digital-silence playback and software ON/OFF/MUTE controls also pass on hard
 **nRF5340 DK + Nucleus 7: pairing and audible computer audio confirmed; quality/stability unresolved.**
 The +3-dBm timing-sweep attempt received eight addressed `0x16` confirmations;
 see the [capture](diagnostics/nucleus7-0.1.12/README.md). With 0.1.14, selecting Mini
-Microphone in the Nucleus app enables audible audio, but the user reports poor
-quality and long dropouts. See [audio diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md).
+Microphone in the Nucleus app enables audible audio. External antenna #1 stopped
+the long dropouts in the user's listening test, but muffled and robotic/raspy
+distortion remains. See [audio diagnostics](diagnostics/nucleus7-audio-0.1.14/README.md).
 Hardware buttons, long-term stability
 and RF range remain unverified.
 The hearing-device results above belong to the original Pico 2 W + nRF24L01+ firmware.

@@ -8,8 +8,9 @@ been verified on a DK. **Version 0.1.12 paired with the tested Nucleus 7:**
 the [successful trace](diagnostics/nucleus7-0.1.12/README.md) contains eight addressed
 `0x16` confirmations after four replies. It used +3 dBm and a READY/START delay sweep;
 the last reply started at 6001 us after beacon END. With 0.1.14, the user **hears
-computer audio after selecting Mini Microphone in the Nucleus app**, but reports
-poor quality and long dropouts. USB audio reaches the DK without drops or faults.
+computer audio after selecting Mini Microphone in the Nucleus app**. With external
+antenna #1, the user reports that long dropouts stopped, but muffled and robotic/
+raspy distortion remains. Captured sessions show no local queue drops or radio faults.
 The current build is 0.1.14 (19 ARM emulation checks). It applies +3 dBm to audio,
 reports input PCM peaks, and keeps RADIO active between the two packets in a slot.
 Hardware traces verify nonzero codec data and a 6144-us frame period;

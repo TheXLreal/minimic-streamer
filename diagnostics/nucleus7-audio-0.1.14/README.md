@@ -44,8 +44,39 @@ Listening comparison: AUDIOGAP 1000 (separate TXEN) made audio disappear, and
 restoring AUDIOGAP 0 plus reselecting Mini Microphone restored intermittent audio.
 AUDIOGAP 130 also made audio disappear; AUDIOGAP 0 was restored again. These
 observations favor the short within-slot gap, but do not establish a stable setting
-or prove the original nRF24 FIFO inter-packet spacing. No external antenna change
-has been made. See [legacy telemetry summary](LEGACY_COMPARISON.json).
+or prove the original nRF24 FIFO inter-packet spacing. These interval comparisons
+preceded the external antenna test. See [legacy telemetry summary](LEGACY_COMPARISON.json).
+
+Disabling the phone's Bluetooth did not improve the dropouts. With firmware and
+AUDIOGAP unchanged, external antenna #1 on J1 improved the median RSSI of received
+processor beacons from -80.5 dBm (4 samples) to -66 dBm (18 samples). The built-in
+antenna capture was idle; the external antenna capture had music playing, a filled
+audio queue and no increase in underflows, drops, late frames or radio faults.
+The user reports that long dropouts stopped, but the audio remains both muffled/
+telephone-like and raspy/robotic. This is an improvement in continuity, not a
+confirmed solution to the quality problem. See [antenna observations](ANTENNA_COMPARISON.json).
+
+RSSI here measures reception at the DK, not at Nucleus 7. These are small,
+non-simultaneous samples with approximate placement and different audio activity;
+the 14.5-dB median difference is an observation, not a calibrated antenna gain.
+
+All three external antennas were then compared at +3 dBm and AUDIOGAP 0, with the
+user keeping placement approximately unchanged and music playing. The captures
+use the same beacon monitor and restore monitoring OFF afterwards.
+
+| External antenna | Median RSSI at DK | Good / bad CRC packets observed | Listening report |
+|---|---:|---:|---|
+| #1 | -66 dBm | 18 / 0 | Long dropouts stopped; muffled and raspy/robotic quality remains |
+| #2 | -75 dBm | 13 / 1 | Seems about the same as #1 |
+| #3 | -75 dBm | 22 / 0 | Possibly better, or about the same; user unsure |
+
+Underflow, queue-drop, late-frame and radio-fault counters did not increase during
+any of these three music captures. These are local transmitter checks, not audio
+delivery acknowledgements from Nucleus 7. The listening reports do not establish
+a clear quality winner. Antenna #1 had the strongest observed beacon reception.
+A repeat after returning to #1 was requested to check reproducibility, but has not
+been captured; the user is currently doing their own listening comparison.
+Long-term stability and RF range remain unverified.
 
 [Header/register/timestamp records](TX_HEADERS.json) retain payload type/counter
 and flags, but omit user music codec bytes, keeping their SHA256 instead. The full

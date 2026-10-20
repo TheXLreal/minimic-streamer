@@ -131,7 +131,7 @@ def main():
             hardware_file.unlink()  # Hardware results also belong to exact images.
     receipt = {
         'built_utc': datetime.now(timezone.utc).isoformat(), 'board': 'nrf5340dk (PCA10095)',
-        'radio': 'nRF5340 network core, proprietary 2 Mbps, 0 dBm, no external nRF24',
+        'radio': 'nRF5340 network core, proprietary 2 Mbps, +3 dBm default (0/+3 runtime), no external nRF24',
         'compiler': subprocess.check_output([compiler, '--version'], text=True).splitlines()[0],
         'base_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'hardware_tested': False,

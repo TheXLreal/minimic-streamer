@@ -29,7 +29,7 @@
     "receiver_count": 1
   },
   "source_selection": "User selected Mini Microphone in Nucleus app; initial activation signal alone was insufficient",
-  "listening": "Audio audible after Nucleus app Mini Microphone selection, but poor quality and long dropouts persist",
+  "listening": "Mini Microphone selected in Nucleus app. External antenna #1 stopped long dropouts in user listening; muffled/telephone-like and raspy/robotic distortion remain. Usable quality and long-term stability are unresolved.",
   "limitations": [
     "RADIO timestamps are internal events, not external RF measurements",
     "Second burst packet START timestamp is a software TIMER capture; ADDRESS/END are hardware DPPI",
@@ -41,5 +41,49 @@
     "AUDIOGAP_1000": "Audio disappeared",
     "current_runtime_gap": 0,
     "external_antenna_change": false
+  },
+  "phone_bluetooth_disabled_user_report": "Dropouts persisted",
+  "external_antenna_observation": {
+    "connector": "J1",
+    "antenna_number": 1,
+    "configured_tx_dbm": 3,
+    "audio_gap_us": 0,
+    "dk_rx_rssi_median_dbm": -66,
+    "long_dropouts_user_report": "Stopped during this listening test",
+    "remaining_quality_user_report": "Both muffled/telephone-like and raspy/robotic",
+    "additional_antennas": "Antennas #2 and #3 compared; no clear listening winner"
+  },
+  "external_antenna_comparison": {
+    "antenna_1": {
+      "median_dk_beacon_rssi_dbm": -66,
+      "good_bad_crc_packets": [
+        18,
+        0
+      ],
+      "listening": "Long dropouts stopped; muffled and raspy/robotic distortion remains"
+    },
+    "antenna_2": {
+      "median_dk_beacon_rssi_dbm": -75,
+      "good_bad_crc_packets": [
+        13,
+        1
+      ],
+      "listening": "Seems about the same"
+    },
+    "antenna_3": {
+      "median_dk_beacon_rssi_dbm": -75,
+      "good_bad_crc_packets": [
+        22,
+        0
+      ],
+      "listening": "Possibly better or about the same; user unsure"
+    },
+    "local_underflows_drops_late_faults_delta_all_three": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "limitations": "Short non-simultaneous captures of reception at DK, not Nucleus 7 audio acknowledgements. Antenna #1 repeat not captured; user is independently comparing antennas."
   }
 }
